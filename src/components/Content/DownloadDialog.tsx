@@ -22,6 +22,14 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
   const [showKeyGen, setShowKeyGen] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
+  // Auto-trigger download when dialog opens if key is valid
+  useEffect(() => {
+    if (open && user && checkKeyValidity()) {
+      console.log('Auto-triggering download - key is valid');
+      performDownload();
+    }
+  }, [open]);
+
   const checkKeyValidity = () => {
     const expiry = localStorage.getItem('downloadKeyExpiry');
     console.log('Checking key validity, expiry:', expiry);

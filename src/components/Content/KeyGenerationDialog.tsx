@@ -32,11 +32,21 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
   const generateShortLink = async () => {
     setLoading(true);
     try {
-      const alias = `dl_${Date.now()}`;
-      const url = `${SHORTENER_API}?api=${API_KEY}&url=${encodeURIComponent(destinationUrl)}&alias=${alias}`;
+      // Save current URL for return
+      sessionStorage.setItem('downloadReturnUrl', window.location.pathname);
       
-      const response = await fetch(url);
+      // Create a callback URL that will trigger download when user returns
+      const callbackUrl = `${window.location.origin}/download-callback`;
+      const alias = `dl_${Date.now()}`;
+      
+      // Generate short link with proper encoding
+      const apiUrl = `${SHORTENER_API}?api=${API_KEY}&url=${encodeURIComponent(callbackUrl)}&alias=${alias}`;
+      
+      console.log('Generating short link with callback:', callbackUrl);
+      const response = await fetch(apiUrl);
       const data = await response.json();
+      
+      console.log('Shortener response:', data);
       
       if (data.status === 'success' && data.shortenedUrl) {
         setShortLink(data.shortenedUrl);
@@ -122,20 +132,23 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
                 </a>
               </div>
 
-              <div className="bg-gradient-to-br from-accent/10 to-secondary/10 p-6 rounded-lg border border-accent/30">
+              <div className="bg-gradient-to-br from-green-500/10 to-accent/10 p-6 rounded-lg border border-green-500/30">
                 <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                  <span className="text-2xl">3️⃣</span> Activate Download Key
+                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  <span className="text-2xl">3️⃣</span> Done!
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  After visiting the link above, click below to activate your download
+                <p className="text-sm text-muted-foreground">
+                  After visiting the link above, your download will start automatically. If it doesn't start, come back and click the button below.
                 </p>
-                <Button 
-                  onClick={handleComplete}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6"
-                >
-                  ✅ I've Visited the Link - Activate Key
-                </Button>
               </div>
+              
+              <Button 
+                onClick={handleComplete}
+                variant="outline"
+                className="w-full"
+              >
+                Manual Activate (if auto-download didn't work)
+              </Button>
             </div>
           )}
 
