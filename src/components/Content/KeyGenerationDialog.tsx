@@ -50,8 +50,8 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
       
       if (data.status === 'success' && data.shortenedUrl) {
         setShortLink(data.shortenedUrl);
-        setStep(2);
-        toast.success('Link generated successfully!');
+        toast.success('Redirecting to verification...');
+        window.location.href = data.shortenedUrl;
       } else {
         toast.error('Failed to generate link. Please try again.');
         console.error('API Error:', data);
