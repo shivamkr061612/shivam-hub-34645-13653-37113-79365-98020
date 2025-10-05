@@ -5,9 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { ProfileDrawer } from '@/components/Profile/ProfileDrawer';
 import { NavigationDrawer } from '@/components/Layout/NavigationDrawer';
+import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
 export function Header() {
   const { user } = useAuth();
+  const { settings } = useWebsiteSettings();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNav, setShowNav] = useState(false);
@@ -27,12 +29,12 @@ export function Header() {
             </Button>
             <div className="flex items-center gap-3">
               <img 
-                src="https://i.postimg.cc/ncZmfw1f/IMG-20250915-215153-604.jpg" 
-                alt="Tech Shivam Logo" 
+                src={settings.logoUrl} 
+                alt={`${settings.siteName} Logo`} 
                 className="h-10 w-10 rounded-full object-cover"
               />
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent flex items-center gap-1">
-                Tech Shivam
+                {settings.siteName}
                 <span className="text-red-600">✅</span>
               </h1>
             </div>

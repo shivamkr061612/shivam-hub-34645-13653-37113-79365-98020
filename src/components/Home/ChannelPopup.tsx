@@ -2,27 +2,24 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Youtube } from 'lucide-react';
+import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
 export function ChannelPopup() {
   const [open, setOpen] = useState(false);
-  const [channelLink, setChannelLink] = useState('');
+  const { settings } = useWebsiteSettings();
 
   useEffect(() => {
-    // Get channel link from localStorage (set by admin)
-    const link = localStorage.getItem('channelLink') || '';
-    setChannelLink(link);
-
     // Show popup every 15 seconds
     const interval = setInterval(() => {
-      if (link) {
+      if (settings.channelLink) {
         setOpen(true);
       }
     }, 15000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [settings.channelLink]);
 
-  if (!channelLink) return null;
+  if (!settings.channelLink) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -41,7 +38,7 @@ export function ChannelPopup() {
           
           <Button 
             onClick={() => {
-              window.open(channelLink, '_blank');
+              window.open(settings.channelLink, '_blank');
               setOpen(false);
             }}
             className="w-full bg-red-600 hover:bg-red-700 text-white"

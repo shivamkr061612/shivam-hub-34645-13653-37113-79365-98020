@@ -4,8 +4,11 @@ import { SectionCard } from '@/components/Home/SectionCard';
 import { ChannelPopup } from '@/components/Home/ChannelPopup';
 import { Package, Film, GraduationCap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
 const Index = () => {
+  const { settings } = useWebsiteSettings();
+  
   const sections = [
     {
       icon: Package,
@@ -54,7 +57,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            Discover amazing mods, movies, and courses all in one place
+            {settings.siteDescription}
           </motion.p>
         </motion.div>
 
@@ -84,37 +87,30 @@ const Index = () => {
             <div>
               <h3 className="text-lg font-bold text-foreground mb-4 gradient-text">About Us</h3>
               <p className="text-sm text-muted-foreground">
-                Welcome to our platform where you can discover amazing mods, movies, and courses. 
-                We are dedicated to providing quality content for our community.
+                {settings.aboutUs}
               </p>
             </div>
             
             <div>
               <h3 className="text-lg font-bold text-foreground mb-4 gradient-text">What We Offer</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                  Game Mods & Enhancements
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-                  Movies Collection
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
-                  Educational Courses
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                  Regular Updates
-                </li>
+                {settings.whatWeOffer.split('|').map((item, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      index % 3 === 0 ? 'bg-primary' : 
+                      index % 3 === 1 ? 'bg-secondary' : 
+                      'bg-accent'
+                    } animate-pulse`}></span>
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
             
             <div>
               <h3 className="text-lg font-bold text-foreground mb-4 gradient-text">Connect With Us</h3>
               <a 
-                href="https://youtube.com/@techshivam" 
+                href={settings.channelLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-glow transition-all duration-300 hover:scale-105 neon-border px-4 py-2 rounded-lg"
