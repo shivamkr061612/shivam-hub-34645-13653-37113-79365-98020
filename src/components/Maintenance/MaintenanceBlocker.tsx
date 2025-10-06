@@ -36,7 +36,7 @@ export function MaintenanceBlocker({ children }: MaintenanceBlockerProps) {
   // Block content for non-admin users when maintenance is on
   if (maintenanceMode && !isAdmin && location.pathname !== '/admin') {
     return (
-      <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-40" />
+      <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-[60]" />
     );
   }
 

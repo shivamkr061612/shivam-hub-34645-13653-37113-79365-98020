@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ref, push, onValue, serverTimestamp, onDisconnect, set, off } from 'firebase/database';
-import { realtimeDb } from '@/lib/firebase';
+import { collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -17,19 +17,15 @@ interface Message {
   timestamp: number;
 }
 
-interface OnlineUser {
-  id: string;
-  name: string;
-  lastSeen: number;
-}
+// Removed online presence for reliability
+
 
 export default function LiveChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [onlineUsers, setOnlineUsers] = useState<Record<string, OnlineUser>>({});
-  const scrollRef = useRef<HTMLDivElement>(null);
+const [newMessage, setNewMessage] = useState('');
+const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) {
@@ -38,41 +34,27 @@ export default function LiveChat() {
       return;
     }
 
-    // Set up presence
-    const userStatusRef = ref(realtimeDb, `presence/${user.uid}`);
-    const presenceRef = ref(realtimeDb, 'presence');
-    
-    set(userStatusRef, {
-      id: user.uid,
-      name: user.displayName || user.email?.split('@')[0] || 'User',
-      lastSeen: serverTimestamp()
-    });
-
-    onDisconnect(userStatusRef).remove();
-
-    // Listen to online users
-    onValue(presenceRef, (snapshot) => {
-      const data = snapshot.val();
-      setOnlineUsers(data || {});
-    });
-
-    // Listen to messages
-    const messagesRef = ref(realtimeDb, 'messages');
-    onValue(messagesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const messageList = Object.entries(data).map(([id, msg]: [string, any]) => ({
-          id,
-          ...msg
-        }));
-        setMessages(messageList.sort((a, b) => a.timestamp - b.timestamp));
-      }
+    // Listen to messages from Firestore
+    const q = query(collection(db, 'messages'), orderBy('timestamp', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const messageList: Message[] = snapshot.docs.map((doc) => {
+        const data: any = doc.data();
+        return {
+          id: doc.id,
+          text: data.text,
+          userId: data.userId,
+          userName: data.userName,
+          timestamp: data.timestamp?.toMillis ? data.timestamp.toMillis() : data.timestamp || Date.now(),
+        };
+      });
+      setMessages(messageList);
+    }, (error) => {
+      console.error('Error listening to messages:', error);
+      toast.error('Failed to load messages.');
     });
 
     return () => {
-      set(userStatusRef, null);
-      off(messagesRef);
-      off(presenceRef);
+      unsubscribe();
     };
   }, [user, navigate]);
 
@@ -86,12 +68,11 @@ export default function LiveChat() {
     if (!newMessage.trim() || !user) return;
 
     try {
-      const messagesRef = ref(realtimeDb, 'messages');
-      await push(messagesRef, {
+      await addDoc(collection(db, 'messages'), {
         text: newMessage,
         userId: user.uid,
         userName: user.displayName || user.email?.split('@')[0] || 'User',
-        timestamp: Date.now()
+        timestamp: serverTimestamp(),
       });
 
       setNewMessage('');
@@ -126,9 +107,6 @@ export default function LiveChat() {
               Live Chat
               <span className="text-red-600">✅</span>
             </h1>
-            <p className="text-sm text-muted-foreground">
-              {Object.keys(onlineUsers).length} users online
-            </p>
           </div>
         </div>
 
@@ -142,7 +120,6 @@ export default function LiveChat() {
             ) : (
               messages.map((message) => {
               const isOwn = message.userId === user?.uid;
-              const isOnline = onlineUsers[message.userId];
               
               return (
                 <div
@@ -159,7 +136,6 @@ export default function LiveChat() {
                       <span className="text-sm font-medium">
                         {message.userName}
                       </span>
-                      {isOnline && <span className="text-red-600 text-xs">✅</span>}
                     </div>
                     <div
                       className={`rounded-lg px-4 py-2 max-w-md ${
