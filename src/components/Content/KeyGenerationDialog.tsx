@@ -100,9 +100,9 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         
         {!loading ? (
           <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 space-y-3">
+            <div className="space-y-3 w-full">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                <CheckCircle2 className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
                 <div>
                   <p className="text-foreground font-medium mb-2">
                     एक बार Key Generate करने के बाद:

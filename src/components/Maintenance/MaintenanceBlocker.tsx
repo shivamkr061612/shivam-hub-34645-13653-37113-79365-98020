@@ -33,12 +33,15 @@ export function MaintenanceBlocker({ children }: MaintenanceBlockerProps) {
     return () => unsubscribe();
   }, [isAdmin, location.pathname, navigate]);
 
-  // Block content for non-admin users when maintenance is on
-  if (maintenanceMode && !isAdmin && location.pathname !== '/admin') {
-    return (
-      <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-[60]" />
-    );
-  }
+  // Show overlay for non-admin users when maintenance is on, but keep children mounted so popups can render
+  const shouldBlock = maintenanceMode && !isAdmin && location.pathname !== '/admin';
 
-  return <>{children}</>;
+  return (
+    <>
+      {shouldBlock && (
+        <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-[60]" aria-hidden="true" />
+      )}
+      {children}
+    </>
+  );
 }
