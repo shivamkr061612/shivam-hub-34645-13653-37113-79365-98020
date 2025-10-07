@@ -38,7 +38,7 @@ export function Header() {
               />
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent flex items-center gap-2">
                 {settings.siteName}
-                {user && isVerified && <img src={blueTick} alt="Verified" className="h-5 w-5" />}
+                {user && isVerified && <img src={blueTick} alt="Verified" className="h-5 w-5 object-contain" />}
               </h1>
             </div>
           </div>
