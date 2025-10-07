@@ -1,19 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import blueTick from '@/assets/blue-tick.png';
 
 interface Message {
   id: string;
   text: string;
   userId: string;
   userName: string;
+  userEmail: string;
   timestamp: number;
 }
 
@@ -24,8 +26,9 @@ export default function LiveChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-const [newMessage, setNewMessage] = useState('');
-const scrollRef = useRef<HTMLDivElement>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [verifiedUsers, setVerifiedUsers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) {
@@ -36,7 +39,7 @@ const scrollRef = useRef<HTMLDivElement>(null);
 
     // Listen to messages from Firestore
     const q = query(collection(db, 'messages'), orderBy('timestamp', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       const messageList: Message[] = snapshot.docs.map((doc) => {
         const data: any = doc.data();
         return {
@@ -44,10 +47,30 @@ const scrollRef = useRef<HTMLDivElement>(null);
           text: data.text,
           userId: data.userId,
           userName: data.userName,
+          userEmail: data.userEmail || '',
           timestamp: data.timestamp?.toMillis ? data.timestamp.toMillis() : data.timestamp || Date.now(),
         };
       });
       setMessages(messageList);
+
+      // Check verification status for all unique users
+      const uniqueEmails = [...new Set(messageList.map(m => m.userEmail).filter(Boolean))];
+      const verified = new Set<string>();
+      
+      await Promise.all(
+        uniqueEmails.map(async (email) => {
+          try {
+            const verificationDoc = await getDoc(doc(db, 'verified_users', email));
+            if (verificationDoc.exists() && verificationDoc.data()?.verified === true) {
+              verified.add(email);
+            }
+          } catch (error) {
+            console.error('Error checking verification:', error);
+          }
+        })
+      );
+      
+      setVerifiedUsers(verified);
     }, (error) => {
       console.error('Error listening to messages:', error);
       toast.error('Failed to load messages.');
@@ -72,6 +95,7 @@ const scrollRef = useRef<HTMLDivElement>(null);
         text: newMessage,
         userId: user.uid,
         userName: user.displayName || user.email?.split('@')[0] || 'User',
+        userEmail: user.email || '',
         timestamp: serverTimestamp(),
       });
 
@@ -120,6 +144,7 @@ const scrollRef = useRef<HTMLDivElement>(null);
             ) : (
               messages.map((message) => {
               const isOwn = message.userId === user?.uid;
+              const isVerified = verifiedUsers.has(message.userEmail);
               
               return (
                 <div
@@ -136,10 +161,15 @@ const scrollRef = useRef<HTMLDivElement>(null);
                       <span className="text-sm font-medium">
                         {message.userName}
                       </span>
+                      {isVerified && (
+                        <img src={blueTick} alt="Verified" className="h-4 w-4 object-contain" />
+                      )}
                     </div>
                     <div
                       className={`rounded-lg px-4 py-2 max-w-md ${
-                        isOwn
+                        isVerified
+                          ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-2 border-blue-400/50 shadow-lg shadow-blue-500/20'
+                          : isOwn
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
                       }`}
@@ -151,8 +181,8 @@ const scrollRef = useRef<HTMLDivElement>(null);
                     </span>
                   </div>
                  </div>
-               );
-             })
+                );
+              })
             )}
            </div>
          </div>
