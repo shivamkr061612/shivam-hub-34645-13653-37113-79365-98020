@@ -104,6 +104,7 @@ export function AdminEdit() {
       if (editMethod === 'url') {
         updateData.downloadUrl = formData.downloadUrl;
         updateData.thumbnail = formData.thumbnail;
+        updateData.updatedAt = new Date().toISOString();
       }
 
       await updateDoc(doc(db, section, editingItem.id), updateData);

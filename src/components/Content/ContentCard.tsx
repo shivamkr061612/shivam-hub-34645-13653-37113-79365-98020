@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Download, Sparkles, RefreshCw } from 'lucide-react';
 import { DownloadDialog } from './DownloadDialog';
 import { motion } from 'framer-motion';
 
@@ -13,6 +14,14 @@ interface ContentCardProps {
 
 export function ContentCard({ item, type, viewMode }: ContentCardProps) {
   const [showDownload, setShowDownload] = useState(false);
+
+  // Check if item is new (within 7 days)
+  const isNew = item.createdAt && 
+    (Date.now() - new Date(item.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+
+  // Check if item is updated (within 7 days)
+  const isUpdated = item.updatedAt && 
+    (Date.now() - new Date(item.updatedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
   return (
     <>
@@ -33,6 +42,22 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
                 className={`w-full object-contain transition-transform duration-300 group-hover:scale-105 ${viewMode === 'list' ? 'h-full rounded-l-lg' : 'h-64 rounded-t-lg bg-card/30'}`}
               />
               <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+              
+              {/* Badges */}
+              <div className="absolute top-2 left-2 flex gap-2">
+                {isNew && (
+                  <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-lg animate-pulse">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    NEW
+                  </Badge>
+                )}
+                {isUpdated && !isNew && (
+                  <Badge className="bg-blue-500 hover:bg-blue-600 text-white shadow-lg">
+                    <RefreshCw className="h-3 w-3 mr-1" />
+                    UPDATED
+                  </Badge>
+                )}
+              </div>
             </div>
           )}
           
