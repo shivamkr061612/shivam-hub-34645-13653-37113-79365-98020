@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { KeyGenerationDialog } from './KeyGenerationDialog';
-import { addDoc, collection, increment, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, increment, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 
@@ -56,6 +56,15 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
 
     setDownloading(true);
     try {
+      // Check if user is banned
+      const userStatsDoc = await getDoc(doc(db, 'user_stats', user?.uid));
+      if (userStatsDoc.exists() && userStatsDoc.data()?.banned === true) {
+        toast.error('🚫 Your account has been banned. Cannot download.');
+        setDownloading(false);
+        onOpenChange(false);
+        return;
+      }
+
       // Track download
       await addDoc(collection(db, 'downloads'), {
         userId: user?.uid,
