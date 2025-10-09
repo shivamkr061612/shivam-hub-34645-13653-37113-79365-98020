@@ -33,25 +33,27 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
   const generateShortLink = async () => {
     setLoading(true);
     try {
-      // Encode current page URL as base64 for return
-      const returnUrl = encodeURIComponent(window.location.href);
-      
+      // Build a safe return URL (fix common typo /mod -> /mods)
+      const current = new URL(window.location.href);
+      if (current.pathname === '/mod') current.pathname = '/mods';
+      const returnUrl = encodeURIComponent(current.toString());
+
       // Create a callback URL with return parameter
       const callbackUrl = `${window.location.origin}/download-callback?return=${returnUrl}`;
       const alias = `dl_${Date.now()}`;
-      
+
       // Generate short link with proper encoding
       const apiUrl = `${SHORTENER_API}?api=${API_KEY}&url=${encodeURIComponent(callbackUrl)}&alias=${alias}`;
-      
+
       console.log('Generating short link with callback:', callbackUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
-      
+
       console.log('Shortener response:', data);
-      
-      if (data.status === 'success' && data.shortenedUrl) {
-        // Open verification link
-        window.open(data.shortenedUrl, '_blank');
+
+      if (data.status === 'success' && (data.shortenedUrl || data.shortenedUrl === '')) {
+        const urlToOpen = data.shortenedUrl || callbackUrl; // Fallback to direct callback if shortener fails silently
+        window.open(urlToOpen, '_blank');
         toast.success('🔗 Verification link opened. Please complete all steps and you will be redirected back.');
         onOpenChange(false);
       } else {

@@ -9,28 +9,67 @@ export default function DownloadCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Activate the download key
+    // 1) Activate the download key immediately
     const expiryTime = Date.now() + KEY_EXPIRY_TIME;
     localStorage.setItem('downloadKeyExpiry', expiryTime.toString());
-    
+
     console.log('Download key activated from callback');
     toast.success('🔑 Download key activated! Valid for 2 hours.');
-    
-    // Get return URL from query parameters
+
+    // 2) Safely resolve where to send the user back
     const urlParams = new URLSearchParams(window.location.search);
-    const returnUrl = urlParams.get('return') || '/';
-    
-    // Redirect back after 2 seconds
-    setTimeout(() => {
+    const rawReturn = urlParams.get('return') || '/';
+
+    const normalizeReturnUrl = (val: string): string => {
+      let decoded = val;
       try {
-        // Try to navigate to the decoded URL
-        const decodedUrl = decodeURIComponent(returnUrl);
-        window.location.href = decodedUrl;
+        decoded = decodeURIComponent(val);
+      } catch {}
+      // Try base64 just in case
+      if (/^[A-Za-z0-9+/=]+$/.test(decoded)) {
+        try {
+          decoded = decodeURIComponent(atob(decoded));
+        } catch {}
+      }
+
+      // Build a URL relative to current origin if needed
+      let target: URL;
+      try {
+        target = new URL(decoded, window.location.origin);
+      } catch {
+        target = new URL('/', window.location.origin);
+      }
+
+      // Fix common wrong path: /mod -> /mods
+      if (target.pathname === '/mod') target.pathname = '/mods';
+
+      // Allow-listed client routes; fallback to home if unknown
+      const allowed = new Set([
+        '/', '/mods', '/movies', '/courses', '/admin', '/request-mod', '/contact', '/live-chat'
+      ]);
+      if (!allowed.has(target.pathname)) {
+        // If it's same-origin unknown path, go home
+        if (target.origin === window.location.origin) {
+          target.pathname = '/';
+          target.search = '';
+        }
+      }
+      return target.toString();
+    };
+
+    const targetUrl = normalizeReturnUrl(rawReturn);
+
+    // 3) Redirect after a short UX delay
+    const t = setTimeout(() => {
+      try {
+        window.location.assign(targetUrl);
       } catch (error) {
         console.error('Error redirecting:', error);
         navigate('/');
       }
-    }, 2000);
+    }, 1200);
+
+    return () => clearTimeout(t);
   }, [navigate]);
 
   return (
