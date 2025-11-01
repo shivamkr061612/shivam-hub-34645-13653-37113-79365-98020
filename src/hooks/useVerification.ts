@@ -18,7 +18,19 @@ export function useVerification() {
 
       try {
         const verificationDoc = await getDoc(doc(db, 'verified_users', user.email));
-        setIsVerified(verificationDoc.exists() && verificationDoc.data()?.verified === true);
+        
+        if (verificationDoc.exists()) {
+          const data = verificationDoc.data();
+          
+          // Check if verification has expired
+          if (data.expiresAt && new Date(data.expiresAt) < new Date()) {
+            setIsVerified(false);
+          } else {
+            setIsVerified(data?.verified === true);
+          }
+        } else {
+          setIsVerified(false);
+        }
       } catch (error) {
         console.error('Error checking verification:', error);
         setIsVerified(false);

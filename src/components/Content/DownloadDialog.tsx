@@ -9,6 +9,7 @@ import { addDoc, collection, increment, doc, updateDoc, getDoc } from 'firebase/
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { useVerification } from '@/hooks/useVerification';
 
 interface DownloadDialogProps {
   open: boolean;
@@ -20,13 +21,21 @@ interface DownloadDialogProps {
 export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialogProps) {
   const { user } = useAuth();
   const { settings } = useWebsiteSettings();
+  const { isVerified } = useVerification();
   const [showAuth, setShowAuth] = useState(false);
   const [showKeyGen, setShowKeyGen] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  // Auto-trigger download when dialog opens if key is valid or key generation is disabled
+  // Auto-trigger download when dialog opens if key is valid or key generation is disabled or user is verified
   useEffect(() => {
     if (open && user) {
+      // If user is verified, download directly
+      if (isVerified) {
+        console.log('User is verified, downloading directly');
+        performDownload();
+        return;
+      }
+      
       // If key generation is disabled, download directly
       if (!settings.keyGenerationEnabled) {
         console.log('Key generation disabled, downloading directly');
@@ -36,7 +45,7 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
         performDownload();
       }
     }
-  }, [open, settings.keyGenerationEnabled]);
+  }, [open, settings.keyGenerationEnabled, isVerified]);
 
   const checkKeyValidity = () => {
     const expiry = localStorage.getItem('downloadKeyExpiry');
@@ -107,12 +116,20 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
     console.log('User:', user);
     console.log('Item:', item);
     console.log('Key generation enabled:', settings.keyGenerationEnabled);
+    console.log('Is verified:', isVerified);
     
     // Check if user is logged in
     if (!user) {
       console.log('User not logged in, showing auth dialog');
       onOpenChange(false);
       setTimeout(() => setShowAuth(true), 100);
+      return;
+    }
+
+    // If user is verified, download directly (no key needed)
+    if (isVerified) {
+      console.log('User is verified, downloading directly without key');
+      performDownload();
       return;
     }
 
@@ -123,7 +140,7 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
       return;
     }
 
-    // Check if key is valid (only when key generation is enabled)
+    // Check if key is valid (only when key generation is enabled and user is not verified)
     const isKeyValid = checkKeyValidity();
     
     if (!isKeyValid) {

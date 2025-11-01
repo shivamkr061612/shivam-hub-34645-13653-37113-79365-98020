@@ -17,6 +17,7 @@ import Contact from "./pages/Contact";
 import DownloadCallback from "./pages/DownloadCallback";
 import NotFound from "./pages/NotFound";
 import LiveChat from "./pages/LiveChat";
+import BlueTickPurchase from "./pages/BlueTickPurchase";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/download-callback" element={<DownloadCallback />} />
               <Route path="/live-chat" element={<LiveChat />} />
+              <Route path="/buy-bluetick" element={<BlueTickPurchase />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </MaintenanceBlocker>

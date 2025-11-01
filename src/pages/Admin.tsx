@@ -12,6 +12,8 @@ import { AdminMessages } from '@/components/Admin/AdminMessages';
 import { AdminVerification } from '@/components/Admin/AdminVerification';
 import { AdminWebsiteSettings } from '@/components/Admin/AdminWebsiteSettings';
 import { AdminNotice } from '@/components/Admin/AdminNotice';
+import { AdminBlueTickSettings } from '@/components/Admin/AdminBlueTickSettings';
+import { AdminBlueTickRequests } from '@/components/Admin/AdminBlueTickRequests';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {
@@ -46,6 +48,8 @@ const Admin = () => {
             <TabsTrigger value="maintenance" className="whitespace-nowrap text-sm">Maintenance</TabsTrigger>
             <TabsTrigger value="messages" className="whitespace-nowrap text-sm">Messages</TabsTrigger>
             <TabsTrigger value="verification" className="whitespace-nowrap text-sm">Verification</TabsTrigger>
+            <TabsTrigger value="bluetick-settings" className="whitespace-nowrap text-sm">Blue Tick Settings</TabsTrigger>
+            <TabsTrigger value="bluetick-requests" className="whitespace-nowrap text-sm">Blue Tick Requests</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload">
@@ -86,6 +90,14 @@ const Admin = () => {
 
           <TabsContent value="verification">
             <AdminVerification />
+          </TabsContent>
+
+          <TabsContent value="bluetick-settings">
+            <AdminBlueTickSettings />
+          </TabsContent>
+
+          <TabsContent value="bluetick-requests">
+            <AdminBlueTickRequests />
           </TabsContent>
         </Tabs>
       </div>

@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Sparkles, RefreshCw } from 'lucide-react';
+import { Download, Sparkles, RefreshCw, Crown, Lock } from 'lucide-react';
 import { DownloadDialog } from './DownloadDialog';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
+import { useVerification } from '@/hooks/useVerification';
+import { toast } from 'sonner';
 
 interface ContentCardProps {
   item: any;
@@ -13,6 +16,8 @@ interface ContentCardProps {
 }
 
 export function ContentCard({ item, type, viewMode }: ContentCardProps) {
+  const { user } = useAuth();
+  const { isVerified } = useVerification();
   const [showDownload, setShowDownload] = useState(false);
 
   // Check if item is new (within 7 days)
@@ -22,6 +27,17 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
   // Check if item is updated (within 7 days)
   const isUpdated = item.updatedAt && 
     (Date.now() - new Date(item.updatedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+
+  const isPremium = item.isPremium === true;
+  const canAccess = !isPremium || (user && isVerified);
+
+  const handleDownloadClick = () => {
+    if (isPremium && !isVerified) {
+      toast.error('🔒 This is premium content. Buy Blue Tick to access!');
+      return;
+    }
+    setShowDownload(true);
+  };
 
   return (
     <>
@@ -45,6 +61,12 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
               
               {/* Badges */}
               <div className="absolute top-2 left-2 flex gap-2">
+                {isPremium && (
+                  <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg">
+                    <Crown className="h-3 w-3 mr-1" />
+                    PREMIUM
+                  </Badge>
+                )}
                 {isNew && (
                   <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-lg animate-pulse">
                     <Sparkles className="h-3 w-3 mr-1" />
@@ -85,11 +107,21 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
                   </p>
                 )}
                 <Button 
-                  onClick={() => setShowDownload(true)} 
+                  onClick={handleDownloadClick} 
                   className="w-full relative z-10 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold mt-2"
+                  variant={isPremium && !canAccess ? 'outline' : 'default'}
                 >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
+                  {isPremium && !canAccess ? (
+                    <>
+                      <Lock className="h-4 w-4 mr-2" />
+                      Premium Content
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>

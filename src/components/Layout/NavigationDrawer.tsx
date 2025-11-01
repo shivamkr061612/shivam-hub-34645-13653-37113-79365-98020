@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChannelDialog } from '@/components/Channels/ChannelDialog';
+import { useVerification } from '@/hooks/useVerification';
 
 interface NavigationDrawerProps {
   open: boolean;
@@ -13,7 +14,8 @@ interface NavigationDrawerProps {
 
 export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const { isVerified } = useVerification();
   const [showChannels, setShowChannels] = useState(false);
 
   const handleNavigation = (path?: string, action?: string) => {
@@ -35,6 +37,8 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
     { icon: MessageSquare, label: 'Contact Us', path: '/contact' },
   ];
 
+  const showBuyBlueTickOption = user && !isVerified;
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -54,6 +58,21 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                 {item.label}
               </Button>
             ))}
+            
+            {showBuyBlueTickOption && (
+              <>
+                <div className="my-4 border-t" />
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-blue-500 hover:text-blue-600"
+                  onClick={() => handleNavigation('/buy-bluetick')}
+                >
+                  <BadgeCheck className="h-5 w-5 mr-3" />
+                  Buy Blue Tick
+                </Button>
+              </>
+            )}
+
             {isAdmin && (
               <>
                 <div className="my-4 border-t" />

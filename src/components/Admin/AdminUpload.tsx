@@ -6,11 +6,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { Upload, Link } from 'lucide-react';
+import { Upload, Link, Crown } from 'lucide-react';
 
 export function AdminUpload() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,8 @@ export function AdminUpload() {
     title: '',
     description: '',
     version: '',
-    size: ''
+    size: '',
+    isPremium: false
   });
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -65,7 +67,7 @@ export function AdminUpload() {
       });
 
       toast.success('Item uploaded successfully!');
-      setFormData({ title: '', description: '', version: '', size: '' });
+      setFormData({ title: '', description: '', version: '', size: '', isPremium: false });
       setFile(null);
       setThumbnail(null);
       setFileUrl('');
@@ -139,6 +141,18 @@ export function AdminUpload() {
                 placeholder="e.g., 150 MB"
               />
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+            <Checkbox
+              id="isPremium"
+              checked={formData.isPremium}
+              onCheckedChange={(checked) => setFormData({ ...formData, isPremium: checked as boolean })}
+            />
+            <Label htmlFor="isPremium" className="flex items-center gap-2 cursor-pointer">
+              <Crown className="h-4 w-4 text-yellow-500" />
+              <span>Mark as Premium (Blue Tick Required)</span>
+            </Label>
           </div>
 
           <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as 'file' | 'url')}>
