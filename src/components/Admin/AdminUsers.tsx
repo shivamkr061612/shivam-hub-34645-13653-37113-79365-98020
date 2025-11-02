@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { collection, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, setDoc, getDoc, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { Ban, CheckCircle, Shield } from 'lucide-react';
+import { Ban, CheckCircle, Shield, Users, Activity } from 'lucide-react';
 import blueTick from '@/assets/blue-tick.png';
 
 export function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [liveUsers, setLiveUsers] = useState(0);
 
   useEffect(() => {
     fetchUsers();
@@ -32,21 +34,34 @@ export function AdminUsers() {
         }
       });
 
-      // Fetch user stats (ban status, verified status)
+      // Fetch user stats (ban status, verified status, last activity)
       const usersWithStats = await Promise.all(
         Array.from(userMap.values()).map(async (user) => {
           const userStatsDoc = await getDoc(doc(db, 'user_stats', user.id));
           const verifiedDoc = await getDoc(doc(db, 'verified_users', user.email));
           
+          const userStatsData = userStatsDoc.exists() ? userStatsDoc.data() : {};
+          
           return {
             ...user,
-            banned: userStatsDoc.exists() ? userStatsDoc.data()?.banned || false : false,
-            verified: verifiedDoc.exists() ? verifiedDoc.data()?.verified || false : false
+            banned: userStatsData?.banned || false,
+            verified: verifiedDoc.exists() ? verifiedDoc.data()?.verified || false : false,
+            lastActivity: userStatsData?.lastActivity || null
           };
         })
       );
 
       setUsers(usersWithStats);
+      setTotalUsers(usersWithStats.length);
+      
+      // Calculate live users (active in last 5 minutes)
+      const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+      const activeUsers = usersWithStats.filter(user => {
+        if (!user.lastActivity) return false;
+        const lastActivityTime = new Date(user.lastActivity).getTime();
+        return lastActivityTime > fiveMinutesAgo;
+      });
+      setLiveUsers(activeUsers.length);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -72,12 +87,45 @@ export function AdminUsers() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>User Management</CardTitle>
-        <CardDescription>Manage registered users</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                <p className="text-3xl font-bold text-primary">{totalUsers}</p>
+              </div>
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Users className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Live Users (5 min)</p>
+                <p className="text-3xl font-bold text-green-600">{liveUsers}</p>
+              </div>
+              <div className="bg-green-600/10 p-3 rounded-full">
+                <Activity className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* User List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+          <CardDescription>Manage registered users - Ban/Unban functionality</CardDescription>
+        </CardHeader>
+        <CardContent>
         {loading ? (
           <div className="text-center py-8">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
@@ -133,7 +181,8 @@ export function AdminUsers() {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

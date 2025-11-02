@@ -15,6 +15,7 @@ import Admin from "./pages/Admin";
 import RequestMod from "./pages/RequestMod";
 import Contact from "./pages/Contact";
 import DownloadCallback from "./pages/DownloadCallback";
+import VerificationSuccess from "./pages/VerificationSuccess";
 import NotFound from "./pages/NotFound";
 import LiveChat from "./pages/LiveChat";
 import BlueTickPurchase from "./pages/BlueTickPurchase";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/request-mod" element={<RequestMod />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/download-callback" element={<DownloadCallback />} />
+              <Route path="/verification-success" element={<VerificationSuccess />} />
               <Route path="/live-chat" element={<LiveChat />} />
               <Route path="/buy-bluetick" element={<BlueTickPurchase />} />
               <Route path="*" element={<NotFound />} />

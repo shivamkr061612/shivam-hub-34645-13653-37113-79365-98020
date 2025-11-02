@@ -73,6 +73,13 @@ export function DownloadDialog({ open, onOpenChange, item, type }: DownloadDialo
 
     setDownloading(true);
     try {
+      // Update user activity timestamp for live user tracking
+      if (user?.uid) {
+        await updateDoc(doc(db, 'user_stats', user.uid), {
+          lastActivity: new Date().toISOString()
+        });
+      }
+
       // Check if user is banned
       const userStatsDoc = await getDoc(doc(db, 'user_stats', user?.uid));
       if (userStatsDoc.exists() && userStatsDoc.data()?.banned === true) {
