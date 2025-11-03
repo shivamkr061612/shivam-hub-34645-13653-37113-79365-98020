@@ -32,8 +32,72 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
       setInputCode('');
       setWaitingForCode(false);
       setLoading(false);
+    } else {
+      // Check if code is in sessionStorage (from verification page)
+      const storedCode = sessionStorage.getItem('verificationCode');
+      if (storedCode && storedCode.length === 10) {
+        setInputCode(storedCode);
+        sessionStorage.removeItem('verificationCode');
+        // Auto-verify after a short delay
+        setTimeout(() => {
+          verifyCodeWithValue(storedCode);
+        }, 500);
+      }
     }
   }, [open]);
+
+  const verifyCodeWithValue = async (codeValue: string) => {
+    if (!user || !codeValue.trim()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const codeDoc = await getDoc(doc(db, 'verification_codes', user.uid));
+      
+      if (!codeDoc.exists()) {
+        toast.error('No verification code found. Please generate a new one.');
+        setInputCode('');
+        setLoading(false);
+        return;
+      }
+
+      const storedData = codeDoc.data();
+      
+      if (storedData.used) {
+        toast.error('This code has already been used. Please generate a new one.');
+        setInputCode('');
+        setLoading(false);
+        return;
+      }
+
+      if (codeValue.trim() === storedData.code) {
+        await setDoc(doc(db, 'verification_codes', user.uid), {
+          ...storedData,
+          used: true,
+          usedAt: new Date().toISOString()
+        });
+
+        const expiryTime = Date.now() + KEY_EXPIRY_TIME;
+        localStorage.setItem('downloadKeyExpiry', expiryTime.toString());
+        
+        toast.success('✅ Verification successful! Download key activated for 2 hours.');
+        
+        setTimeout(() => {
+          onKeyGenerated();
+          onOpenChange(false);
+        }, 1000);
+      } else {
+        toast.error('❌ Invalid code. Only the generated code will work.');
+        setInputCode('');
+      }
+    } catch (error) {
+      toast.error('Verification failed. Please try again.');
+      console.error('Verification error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generateVerificationCode = () => {
     return Math.floor(1000000000 + Math.random() * 9000000000).toString();
@@ -89,68 +153,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
   };
 
   const verifyCode = async () => {
-    if (!user || !inputCode.trim()) {
-      toast.error('Please enter the verification code');
-      return;
-    }
-
-    if (inputCode.trim().length !== 10) {
-      toast.error('Code must be 10 digits');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Get stored code from Firestore
-      const codeDoc = await getDoc(doc(db, 'verification_codes', user.uid));
-      
-      if (!codeDoc.exists()) {
-        toast.error('No verification code found. Please generate a new one.');
-        setWaitingForCode(false);
-        setInputCode('');
-        setLoading(false);
-        return;
-      }
-
-      const storedData = codeDoc.data();
-      
-      if (storedData.used) {
-        toast.error('This code has already been used. Please generate a new one.');
-        setWaitingForCode(false);
-        setInputCode('');
-        setLoading(false);
-        return;
-      }
-
-      // Verify code matches
-      if (inputCode.trim() === storedData.code) {
-        // Mark code as used
-        await setDoc(doc(db, 'verification_codes', user.uid), {
-          ...storedData,
-          used: true,
-          usedAt: new Date().toISOString()
-        });
-
-        // Activate download key
-        const expiryTime = Date.now() + KEY_EXPIRY_TIME;
-        localStorage.setItem('downloadKeyExpiry', expiryTime.toString());
-        
-        toast.success('✅ Verification successful! Download key activated for 2 hours.');
-        
-        setTimeout(() => {
-          onKeyGenerated();
-          onOpenChange(false);
-        }, 1000);
-      } else {
-        toast.error('❌ Invalid code. Please check and try again.');
-        setInputCode('');
-      }
-    } catch (error) {
-      toast.error('Verification failed. Please try again.');
-      console.error('Verification error:', error);
-    } finally {
-      setLoading(false);
-    }
+    await verifyCodeWithValue(inputCode);
   };
 
   return (
@@ -165,29 +168,63 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
           </DialogDescription>
         </DialogHeader>
         
-        {!waitingForCode ? (
-          <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="space-y-3 w-full">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-foreground font-medium mb-2">
-                    एक बार Key Generate करने के बाद:
-                  </p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>✓ 2 घंटे तक Free Download कर सकते हैं</li>
-                    <li>✓ कोई Additional Verification नहीं</li>
-                    <li>✓ Unlimited Downloads (2 hours में)</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3 mt-4">
-                <p className="text-sm text-yellow-600 dark:text-yellow-500">
-                  ⚠️ ध्यान दें: Verification पूरा करने के बाद आपको एक 10 अंकों का Code मिलेगा, वो Code यहाँ Enter करना होगा
+        <div className="flex flex-col items-center justify-center py-6 space-y-6">
+          <div className="space-y-4 w-full">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+              <div>
+                <p className="text-foreground font-medium mb-2">
+                  एक बार Key Generate करने के बाद:
                 </p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>✓ 2 घंटे तक Free Download कर सकते हैं</li>
+                  <li>✓ कोई Additional Verification नहीं</li>
+                  <li>✓ Unlimited Downloads (2 hours में)</li>
+                </ul>
               </div>
             </div>
+            
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
+              <p className="text-sm text-yellow-600 dark:text-yellow-500">
+                ⚠️ ध्यान दें: Verification पूरा करने के बाद आपको Code यहाँ automatically fill हो जाएगा
+              </p>
+            </div>
+
+            {/* Code Input Field - Always Visible */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Enter 10-Digit Verification Code
+              </label>
+              <Input
+                type="text"
+                placeholder="Code will auto-fill after verification..."
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                maxLength={10}
+                className="text-center text-lg tracking-widest font-mono"
+                disabled={loading}
+              />
+            </div>
+
+            {inputCode.length === 10 && (
+              <Button 
+                onClick={verifyCode}
+                size="lg"
+                disabled={loading}
+                className="w-full font-semibold"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    ✅ Verify Code
+                  </>
+                )}
+              </Button>
+            )}
             
             <Button 
               onClick={generateShortLink}
@@ -206,68 +243,21 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
                 </>
               )}
             </Button>
+
+            <Button 
+              onClick={() => {
+                onOpenChange(false);
+                window.location.href = '/#/buy-bluetick';
+              }}
+              variant="outline"
+              size="lg"
+              className="w-full font-semibold"
+              disabled={loading}
+            >
+              💎 Don't need to generate key - Buy Blue Tick
+            </Button>
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="space-y-4 w-full">
-              <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-4 text-center">
-                <KeyRound className="h-12 w-12 text-primary mx-auto mb-3" />
-                <p className="text-lg font-semibold text-foreground mb-2">
-                  Verification पूरा करें
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Verification complete होने के बाद आपको 10 अंकों का Code मिलेगा। वो Code नीचे Enter करें।
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Enter 10-Digit Verification Code
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Enter code here..."
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  maxLength={10}
-                  className="text-center text-lg tracking-widest font-mono"
-                />
-              </div>
-
-              <Button 
-                onClick={verifyCode}
-                size="lg"
-                disabled={loading || inputCode.length !== 10}
-                className="w-full font-semibold"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    ✅ Verify Code
-                  </>
-                )}
-              </Button>
-
-              <Button 
-                onClick={() => {
-                  setWaitingForCode(false);
-                  setInputCode('');
-                  generateShortLink();
-                }}
-                variant="outline"
-                size="sm"
-                className="w-full"
-                disabled={loading}
-              >
-                Generate New Code
-              </Button>
-            </div>
-          </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );

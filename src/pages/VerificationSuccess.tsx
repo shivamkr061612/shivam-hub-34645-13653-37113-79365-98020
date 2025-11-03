@@ -54,9 +54,15 @@ export default function VerificationSuccess() {
     }
   };
 
-  const goBack = () => {
+  const returnWithCode = () => {
+    // Store code in sessionStorage for auto-fill
+    if (verificationCode) {
+      sessionStorage.setItem('verificationCode', verificationCode);
+    }
+    
     // Navigate back to the page where user initiated download
     const returnPath = sessionStorage.getItem('downloadReturnPath') || '/mods';
+    sessionStorage.removeItem('downloadReturnPath');
     navigate(returnPath);
   };
 
@@ -117,29 +123,29 @@ export default function VerificationSuccess() {
                     </Button>
                   </div>
 
-                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-2">
-                    <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-500">
-                      ⚠️ महत्वपूर्ण निर्देश:
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 space-y-2">
+                    <p className="text-sm font-semibold text-green-700 dark:text-green-500">
+                      ✅ अगला कदम:
                     </p>
-                    <ul className="text-sm text-yellow-600 dark:text-yellow-400 space-y-1 list-disc list-inside">
-                      <li>यह Code सिर्फ एक बार use हो सकता है</li>
-                      <li>Website पर वापस जाएं और यह Code Enter करें</li>
-                      <li>Code enter करने के बाद 2 घंटे तक Free Download कर सकते हैं</li>
+                    <ul className="text-sm text-green-600 dark:text-green-400 space-y-1 list-disc list-inside">
+                      <li>नीचे दिए गए बटन पर क्लिक करें</li>
+                      <li>Code automatically verify हो जाएगा</li>
+                      <li>2 घंटे तक Free Download कर सकते हैं</li>
                     </ul>
                   </div>
 
                   <div className="space-y-3">
                     <Button 
-                      onClick={goBack}
+                      onClick={returnWithCode}
                       size="lg"
                       className="w-full font-semibold"
                     >
                       <ArrowLeft className="h-5 w-5 mr-2" />
-                      वापस Website पर जाएं और Code Enter करें
+                      वापस जाएं और Auto-Verify करें
                     </Button>
                     
                     <p className="text-xs text-center text-muted-foreground">
-                      आप यह Code Copy करके Website पर वापस जा सकते हैं
+                      Code automatically fill हो जाएगा और verify हो जाएगा
                     </p>
                   </div>
                 </>
