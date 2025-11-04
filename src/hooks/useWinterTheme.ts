@@ -34,5 +34,16 @@ export function useWinterTheme() {
     return () => unsubscribe();
   }, []);
 
+  // Apply winter theme class to document root
+  useEffect(() => {
+    if (winterThemeEnabled) {
+      document.documentElement.classList.add('winter-theme');
+      document.body.classList.add('winter-theme');
+    } else {
+      document.documentElement.classList.remove('winter-theme');
+      document.body.classList.remove('winter-theme');
+    }
+  }, [winterThemeEnabled]);
+
   return { winterThemeEnabled, loading };
 }

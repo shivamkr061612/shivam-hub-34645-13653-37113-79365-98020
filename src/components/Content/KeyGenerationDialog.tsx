@@ -86,6 +86,20 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         setTimeout(() => {
           onKeyGenerated();
           onOpenChange(false);
+          
+          // Redirect to the download input after successful verification
+          const returnPath = sessionStorage.getItem('downloadReturnPath');
+          if (returnPath && returnPath !== window.location.pathname) {
+            window.location.hash = returnPath;
+          }
+          
+          // Trigger download dialog to open after a short delay
+          setTimeout(() => {
+            const downloadButton = document.querySelector('[data-download-trigger]') as HTMLButtonElement;
+            if (downloadButton) {
+              downloadButton.click();
+            }
+          }, 500);
         }, 1000);
       } else {
         toast.error('❌ Invalid code. Only the generated code will work.');
