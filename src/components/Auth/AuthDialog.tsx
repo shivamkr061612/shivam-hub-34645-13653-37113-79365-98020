@@ -40,7 +40,8 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
         }
         toast.success('Welcome back!');
       } else {
-        if (restrictToEmail) {
+        // Allow sign up for admin email even during maintenance
+        if (restrictToEmail && email.toLowerCase() !== restrictToEmail.toLowerCase()) {
           toast.error('Sign up is disabled during maintenance.');
           return;
         }
@@ -53,7 +54,27 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
       setPassword('');
       setDisplayName('');
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed');
+      // Handle specific Firebase auth errors
+      const errorCode = error.code;
+      let errorMessage = 'Authentication failed';
+      
+      if (errorCode === 'auth/invalid-credential' || errorCode === 'auth/wrong-password') {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (errorCode === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email. Please sign up first.';
+      } else if (errorCode === 'auth/invalid-email') {
+        errorMessage = 'Invalid email format.';
+      } else if (errorCode === 'auth/user-disabled') {
+        errorMessage = 'This account has been disabled.';
+      } else if (errorCode === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered. Please login instead.';
+      } else if (errorCode === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please use at least 6 characters.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -149,16 +170,14 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
           </Button>
-          {!restrictToEmail && (
-            <Button
-              type="button"
-              variant="link"
-              className="w-full"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="link"
+            className="w-full"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
