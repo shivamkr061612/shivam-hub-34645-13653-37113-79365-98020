@@ -18,7 +18,7 @@ interface AuthDialogProps {
 
 export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: AuthDialogProps) {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(restrictToEmail || '');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,9 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
       if (errorCode === 'auth/invalid-credential' || errorCode === 'auth/wrong-password') {
         errorMessage = 'Invalid email or password. Please check your credentials.';
       } else if (errorCode === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email. Please sign up first.';
+        errorMessage = 'Account not found. Click "Sign up" below to create your admin account.';
+        // Auto-switch to signup mode for better UX
+        setTimeout(() => setIsLogin(false), 2000);
       } else if (errorCode === 'auth/invalid-email') {
         errorMessage = 'Invalid email format.';
       } else if (errorCode === 'auth/user-disabled') {
@@ -103,7 +105,14 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md z-[80]">
         <DialogHeader>
-          <DialogTitle>{isLogin ? 'Login' : 'Sign Up'}</DialogTitle>
+          <DialogTitle>{isLogin ? 'Admin Login' : 'Create Admin Account'}</DialogTitle>
+          {restrictToEmail && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {isLogin 
+                ? 'Login with your admin credentials. If account doesn\'t exist, click Sign up below.' 
+                : 'Create your admin account to access the system during maintenance.'}
+            </p>
+          )}
         </DialogHeader>
         
         {!restrictToEmail && (
@@ -154,6 +163,8 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={!!restrictToEmail}
+              className={restrictToEmail ? 'bg-muted' : ''}
             />
           </div>
           <div className="space-y-2">
