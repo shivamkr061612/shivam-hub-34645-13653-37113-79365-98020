@@ -80,7 +80,7 @@ export function AuthDialog({ open, onOpenChange, restrictToEmail, onSuccess }: A
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md z-[80]">
         <DialogHeader>
           <DialogTitle>{isLogin ? 'Login' : 'Sign Up'}</DialogTitle>
         </DialogHeader>

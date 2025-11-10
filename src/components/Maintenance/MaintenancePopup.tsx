@@ -76,7 +76,7 @@ export function MaintenancePopup() {
       }
       setOpen(newOpen);
     }}>
-      <DialogContent className="sm:max-w-md glass-effect border-2 border-primary/50 neon-border" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-md glass-effect border-2 border-primary/50 neon-border z-[70]" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <motion.div
             initial={{ scale: 0 }}
