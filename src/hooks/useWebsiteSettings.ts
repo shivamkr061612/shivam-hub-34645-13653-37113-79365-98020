@@ -13,9 +13,9 @@ interface WebsiteSettings {
 }
 
 const defaultSettings: WebsiteSettings = {
-  siteName: 'Tech Shivam',
+  siteName: 'TS HUB',
   siteDescription: 'Discover amazing mods, movies, and courses all in one place',
-  logoUrl: 'https://i.postimg.cc/ncZmfw1f/IMG-20250915-215153-604.jpg',
+  logoUrl: 'https://i.postimg.cc/Y9CH9XBQ/IMG-20251112-091800-841.jpg',
   aboutUs: 'Welcome to our platform where you can discover amazing mods, movies, and courses. We are dedicated to providing quality content for our community.',
   whatWeOffer: 'Game Mods & Enhancements|Movies Collection|Educational Courses|Regular Updates',
   channelLink: 'https://youtube.com/@techshivam',
