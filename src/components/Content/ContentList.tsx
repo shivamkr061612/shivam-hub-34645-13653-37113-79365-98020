@@ -9,7 +9,7 @@ interface ContentListProps {
   title: string;
   items: any[];
   loading: boolean;
-  type: 'mods' | 'movies' | 'courses';
+  type: 'mods' | 'movies' | 'courses' | 'games';
 }
 
 export function ContentList({ title, items, loading, type }: ContentListProps) {

@@ -3,7 +3,7 @@ import { QuoteCarousel } from '@/components/Home/QuoteCarousel';
 import { SectionCard } from '@/components/Home/SectionCard';
 import { ChannelPopup } from '@/components/Home/ChannelPopup';
 import { HomePopup } from '@/components/Home/HomePopup';
-import { Package, Film, GraduationCap } from 'lucide-react';
+import { Package, Film, GraduationCap, Gamepad2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
@@ -16,6 +16,12 @@ const Index = () => {
       title: 'Mods',
       description: 'Discover and download the latest game modifications and enhancements',
       path: '/mods',
+    },
+    {
+      icon: Gamepad2,
+      title: 'Games',
+      description: 'Explore and download exciting games for all platforms',
+      path: '/games',
     },
     {
       icon: Film,
@@ -72,7 +78,7 @@ const Index = () => {
         </motion.div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {sections.map((section, index) => (
             <SectionCard
               key={section.title}

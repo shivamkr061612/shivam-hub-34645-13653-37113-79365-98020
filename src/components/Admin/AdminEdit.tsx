@@ -152,6 +152,7 @@ export function AdminEdit() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="mods">Mods</SelectItem>
+                <SelectItem value="games">Games</SelectItem>
                 <SelectItem value="movies">Movies</SelectItem>
                 <SelectItem value="courses">Courses</SelectItem>
               </SelectContent>
