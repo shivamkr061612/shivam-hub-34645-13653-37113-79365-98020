@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { usePopupSettings } from '@/hooks/usePopupSettings';
+import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -35,6 +36,7 @@ const getFontFamilyClass = (font: string) => {
 
 export function HomePopup() {
   const { settings, loading } = usePopupSettings();
+  const { settings: websiteSettings } = useWebsiteSettings();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -47,22 +49,21 @@ export function HomePopup() {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg shadow-lg max-w-md w-full p-6 space-y-4 border">
-        <div className="flex items-start justify-between gap-4">
-          <p
-            className={`flex-1 text-base leading-relaxed ${getTextColorClass(settings.textColor)} ${getFontFamilyClass(settings.fontFamily)}`}
-          >
-            {settings.text}
-          </p>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            onClick={() => setIsVisible(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+      <div className="bg-background rounded-lg shadow-lg max-w-md w-full p-6 space-y-4 border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)]">
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
+          <img 
+            src={websiteSettings.logoUrl} 
+            alt={websiteSettings.siteName}
+            className="h-10 w-10 object-contain rounded"
+          />
+          <h3 className="font-bold text-lg gradient-text">{websiteSettings.siteName}</h3>
         </div>
+
+        <p
+          className={`text-base leading-relaxed ${getTextColorClass(settings.textColor)} ${getFontFamilyClass(settings.fontFamily)}`}
+        >
+          {settings.text}
+        </p>
 
         {settings.linkUrl && settings.linkName && (
           <div className="flex items-center justify-between pt-2 border-t">

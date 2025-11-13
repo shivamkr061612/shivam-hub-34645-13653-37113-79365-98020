@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, BadgeCheck } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, BadgeCheck, Gamepad2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChannelDialog } from '@/components/Channels/ChannelDialog';
@@ -29,6 +29,7 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
 
   const menuItems = [
     { icon: Package, label: 'Mods', path: '/mods' },
+    { icon: Gamepad2, label: 'Games', path: '/games' },
     { icon: Film, label: 'Movies', path: '/movies' },
     { icon: GraduationCap, label: 'Courses', path: '/courses' },
     { icon: MessageCircle, label: 'Live Chat', path: '/live-chat' },
@@ -62,14 +63,6 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
             {showBuyBlueTickOption && (
               <>
                 <div className="my-4 border-t" />
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-blue-500 hover:text-blue-600"
-                  onClick={() => handleNavigation('/buy-bluetick')}
-                >
-                  <BadgeCheck className="h-5 w-5 mr-3" />
-                  Buy Blue Tick
-                </Button>
               </>
             )}
 
