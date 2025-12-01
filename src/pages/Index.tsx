@@ -3,7 +3,7 @@ import { QuoteCarousel } from '@/components/Home/QuoteCarousel';
 import { SectionCard } from '@/components/Home/SectionCard';
 import { ChannelPopup } from '@/components/Home/ChannelPopup';
 import { HomePopup } from '@/components/Home/HomePopup';
-import { Package, Film, GraduationCap, Gamepad2 } from 'lucide-react';
+import { Package, Film, GraduationCap, Gamepad2, Layers, FolderArchive } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
@@ -22,6 +22,18 @@ const Index = () => {
       title: 'Games',
       description: 'Explore and download exciting games for all platforms',
       path: '/games',
+    },
+    {
+      icon: Layers,
+      title: 'Assets',
+      description: 'Download premium quality assets for your projects',
+      path: '/assets',
+    },
+    {
+      icon: FolderArchive,
+      title: 'Bundles',
+      description: 'Get amazing bundle packs with exclusive content',
+      path: '/bundles',
     },
     {
       icon: Film,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, BadgeCheck, Gamepad2 } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, Gamepad2, Layers, FolderArchive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChannelDialog } from '@/components/Channels/ChannelDialog';
@@ -33,6 +33,8 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
   const menuItems = [
     { icon: Package, label: 'Mods', path: '/mods' },
     { icon: Gamepad2, label: 'Games', path: '/games' },
+    { icon: Layers, label: 'Assets', path: '/assets' },
+    { icon: FolderArchive, label: 'Bundles', path: '/bundles' },
     { icon: Film, label: 'Movies', path: 'https://tech-movies.vercel.app/', external: true },
     { icon: GraduationCap, label: 'Courses', path: '/courses' },
     { icon: MessageCircle, label: 'Live Chat', path: '/live-chat' },
