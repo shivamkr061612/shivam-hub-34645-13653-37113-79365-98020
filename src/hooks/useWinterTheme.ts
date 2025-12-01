@@ -4,30 +4,33 @@ import { db } from '@/lib/firebase';
 
 export function useWinterTheme() {
   const [winterThemeEnabled, setWinterThemeEnabled] = useState(false);
+  const [colorTheme, setColorTheme] = useState('default');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchWinterTheme = async () => {
+    const fetchTheme = async () => {
       try {
         const docRef = doc(db, 'settings', 'theme');
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           setWinterThemeEnabled(docSnap.data()?.winterThemeEnabled || false);
+          setColorTheme(docSnap.data()?.colorTheme || 'default');
         }
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching winter theme:', error);
+        console.error('Error fetching theme:', error);
         setLoading(false);
       }
     };
 
-    fetchWinterTheme();
+    fetchTheme();
 
     // Listen for real-time updates
     const unsubscribe = onSnapshot(doc(db, 'settings', 'theme'), (doc) => {
       if (doc.exists()) {
         setWinterThemeEnabled(doc.data()?.winterThemeEnabled || false);
+        setColorTheme(doc.data()?.colorTheme || 'default');
       }
     });
 
@@ -45,5 +48,16 @@ export function useWinterTheme() {
     }
   }, [winterThemeEnabled]);
 
-  return { winterThemeEnabled, loading };
+  // Apply color theme class
+  useEffect(() => {
+    document.documentElement.classList.remove('cyber-pink-theme');
+    document.body.classList.remove('cyber-pink-theme');
+    
+    if (colorTheme === 'cyber-pink') {
+      document.documentElement.classList.add('cyber-pink-theme');
+      document.body.classList.add('cyber-pink-theme');
+    }
+  }, [colorTheme]);
+
+  return { winterThemeEnabled, colorTheme, loading };
 }

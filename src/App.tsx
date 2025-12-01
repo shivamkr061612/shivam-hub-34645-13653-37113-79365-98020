@@ -15,6 +15,8 @@ import Mods from "./pages/Mods";
 
 import Courses from "./pages/Courses";
 import Games from "./pages/Games";
+import Assets from "./pages/Assets";
+import Bundles from "./pages/Bundles";
 import Admin from "./pages/Admin";
 import RequestMod from "./pages/RequestMod";
 import Contact from "./pages/Contact";
@@ -40,6 +42,8 @@ const AppContent = () => {
           <Route path="/mods" element={<Mods />} />
           <Route path="/mod" element={<Mods />} />
           <Route path="/games" element={<Games />} />
+          <Route path="/assets" element={<Assets />} />
+          <Route path="/bundles" element={<Bundles />} />
           
           <Route path="/courses" element={<Courses />} />
           <Route path="/admin" element={<Admin />} />

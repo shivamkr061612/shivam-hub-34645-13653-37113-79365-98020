@@ -106,6 +106,108 @@
     --sidebar-ring: 200 90% 50%;
   }
 
+  /* Cyber Pink Theme - Light Mode */
+  .cyber-pink-theme {
+    --background: 240 10% 96%;
+    --foreground: 240 10% 10%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+    
+    --primary: 330 85% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 330 90% 70%;
+    
+    --secondary: 220 90% 55%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 280 80% 60%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 240 10% 90%;
+    --muted-foreground: 240 5% 45%;
+    
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 240 10% 85%;
+    --input: 240 10% 92%;
+    --ring: 330 85% 60%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(330 85% 60%), hsl(280 80% 65%), hsl(220 90% 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(220 90% 55%), hsl(280 80% 60%));
+    --gradient-accent: linear-gradient(135deg, hsl(280 80% 60%), hsl(330 85% 65%));
+    --gradient-cyber: linear-gradient(135deg, hsl(330 85% 60%), hsl(280 80% 60%), hsl(220 90% 55%));
+    --gradient-bg: radial-gradient(ellipse at top, hsl(240 15% 94%), hsl(240 10% 96%));
+    
+    --shadow-glow: 0 0 40px hsl(330 85% 60% / 0.3), 0 0 80px hsl(220 90% 55% / 0.15);
+    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.08);
+    --shadow-neon: 0 0 20px hsl(330 85% 60% / 0.5), 0 0 40px hsl(220 90% 55% / 0.3);
+    
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 10%;
+    --sidebar-primary: 330 85% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 95%;
+    --sidebar-accent-foreground: 240 10% 10%;
+    --sidebar-border: 240 10% 85%;
+    --sidebar-ring: 330 85% 60%;
+  }
+
+  /* Cyber Pink Theme - Dark Mode */
+  .dark.cyber-pink-theme {
+    --background: 240 15% 8%;
+    --foreground: 0 0% 98%;
+    
+    --card: 240 15% 12%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 240 15% 10%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 330 90% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 330 95% 75%;
+    
+    --secondary: 220 95% 60%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 280 85% 65%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 240 15% 20%;
+    --muted-foreground: 240 5% 70%;
+    
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 240 15% 22%;
+    --input: 240 15% 18%;
+    --ring: 330 90% 65%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(330 90% 65%), hsl(280 85% 70%), hsl(220 95% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(220 95% 60%), hsl(280 85% 65%));
+    --gradient-accent: linear-gradient(135deg, hsl(280 85% 65%), hsl(330 90% 70%));
+    --gradient-cyber: linear-gradient(135deg, hsl(330 90% 65%), hsl(280 85% 65%), hsl(220 95% 60%));
+    --gradient-bg: radial-gradient(ellipse at top, hsl(240 20% 10%), hsl(240 15% 8%));
+    
+    --shadow-glow: 0 0 50px hsl(330 90% 65% / 0.4), 0 0 100px hsl(220 95% 60% / 0.2);
+    --shadow-card: 0 8px 40px hsl(330 80% 50% / 0.3);
+    --shadow-neon: 0 0 25px hsl(330 90% 65% / 0.6), 0 0 50px hsl(220 95% 60% / 0.4);
+    
+    --sidebar-background: 240 15% 12%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 330 90% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 15% 20%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 15% 22%;
+    --sidebar-ring: 330 90% 65%;
+  }
+
   .dark {
     --background: 0 0% 10%;
     --foreground: 0 0% 98%;
@@ -244,6 +346,74 @@
       radial-gradient(circle at 80% 70%, hsl(180 85% 60% / 0.12), transparent 40%),
       radial-gradient(circle at 50% 50%, hsl(220 80% 65% / 0.08), transparent 50%),
       radial-gradient(circle at 40% 60%, hsl(200 70% 70% / 0.1), transparent 35%);
+  }
+
+  /* Cyber Pink Theme Background Effects */
+  body.cyber-pink-theme::before {
+    background: 
+      radial-gradient(circle at 20% 30%, hsl(330 90% 60% / 0.15), transparent 40%),
+      radial-gradient(circle at 80% 70%, hsl(220 95% 55% / 0.12), transparent 40%),
+      radial-gradient(circle at 50% 50%, hsl(280 85% 60% / 0.1), transparent 50%),
+      radial-gradient(circle at 30% 80%, hsl(330 85% 65% / 0.08), transparent 35%);
+  }
+
+  body.cyber-pink-theme::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(135deg, 
+        hsl(330 80% 60% / 0.05) 0%, 
+        transparent 40%, 
+        hsl(220 90% 55% / 0.05) 100%
+      );
+    pointer-events: none;
+    z-index: 0;
+    animation: cyber-shimmer 6s ease-in-out infinite;
+  }
+
+  @keyframes cyber-shimmer {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .cyber-pink-theme .glass-effect {
+    background: hsl(var(--card) / 0.5);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid hsl(330 80% 70% / 0.3);
+    box-shadow: 
+      0 8px 32px hsl(330 60% 40% / 0.15),
+      inset 0 1px 0 hsl(330 80% 90% / 0.2);
+  }
+
+  .cyber-pink-theme .neon-border {
+    box-shadow: 
+      0 0 15px hsl(330 90% 60% / 0.6),
+      0 0 30px hsl(220 95% 60% / 0.4),
+      0 0 45px hsl(280 85% 65% / 0.2),
+      inset 0 0 15px hsl(330 90% 70% / 0.15);
+  }
+
+  .cyber-pink-theme .card-glow {
+    box-shadow: var(--shadow-glow), 0 0 100px hsl(330 90% 70% / 0.2);
+    animation: cyber-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes cyber-glow {
+    0%, 100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.1);
+    }
   }
 
   body.winter-theme::after {
