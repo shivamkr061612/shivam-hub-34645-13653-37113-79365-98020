@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Snowflake, Palette } from 'lucide-react';
+import { Snowflake, Palette, Flame, Sparkles } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
@@ -51,7 +51,12 @@ export function AdminTheme() {
       setColorTheme(theme);
       const docRef = doc(db, 'settings', 'theme');
       await setDoc(docRef, { colorTheme: theme }, { merge: true });
-      toast.success(`🎨 ${theme === 'cyber-pink' ? 'Cyber Pink' : 'Default'} theme activated!`);
+      const themeNames: Record<string, string> = {
+        'default': 'Default (Red & White)',
+        'cyber-pink': 'Cyber Pink',
+        'cartoon': 'Cartoon Fun'
+      };
+      toast.success(`🎨 ${themeNames[theme]} theme activated!`);
     } catch (error) {
       console.error('Error updating color theme:', error);
       toast.error('Failed to update theme settings');
@@ -86,13 +91,19 @@ export function AdminTheme() {
               <SelectItem value="default">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 to-red-600" />
-                  Default (Red)
+                  Default (Red & White)
                 </div>
               </SelectItem>
               <SelectItem value="cyber-pink">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500" />
                   Cyber Pink (Black, Blue, Pink, White)
+                </div>
+              </SelectItem>
+              <SelectItem value="cartoon">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500" />
+                  Cartoon Fun (Fire & Winter Effects)
                 </div>
               </SelectItem>
             </SelectContent>
@@ -120,6 +131,16 @@ export function AdminTheme() {
           <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
             <p className="text-sm text-muted-foreground">
               ❄️ Winter theme is now active! Users will see falling snow across the website.
+            </p>
+          </div>
+        )}
+
+        {colorTheme === 'cartoon' && (
+          <div className="p-4 bg-gradient-to-r from-orange-500/10 via-yellow-500/10 to-cyan-500/10 rounded-lg border border-orange-500/20">
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <Flame className="h-4 w-4 text-orange-500" />
+              <Sparkles className="h-4 w-4 text-cyan-500" />
+              Cartoon theme with fire & winter effects is active!
             </p>
           </div>
         )}

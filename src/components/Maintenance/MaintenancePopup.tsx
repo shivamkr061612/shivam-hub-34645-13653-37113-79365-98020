@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Construction, Shield } from 'lucide-react';
+import { Construction, Shield, Clock, Sparkles } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,10 @@ export function MaintenancePopup() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [open, setOpen] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [description, setDescription] = useState('');
+  const [updateVersion, setUpdateVersion] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const { isAdmin, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,8 +27,12 @@ export function MaintenancePopup() {
       doc(db, 'settings', 'maintenance'),
       (doc) => {
         if (doc.exists()) {
-          const enabled = doc.data()?.enabled || false;
+          const data = doc.data();
+          const enabled = data?.enabled || false;
           setMaintenanceMode(enabled);
+          setDescription(data?.description || '');
+          setUpdateVersion(data?.updateVersion || '');
+          setEndTime(data?.endTime || '');
           
           // If maintenance is on and user is not admin and not on admin page
           if (enabled && !isAdmin && location.pathname !== '/admin') {
@@ -45,6 +53,33 @@ export function MaintenancePopup() {
 
     return () => unsubscribe();
   }, [isAdmin, location.pathname, navigate]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!endTime) return;
+
+    const updateCountdown = () => {
+      const end = new Date(endTime).getTime();
+      const now = new Date().getTime();
+      const diff = end - now;
+
+      if (diff <= 0) {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      setCountdown({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000)
+      });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [endTime]);
 
   const handleAdminAccess = () => {
     if (user) {
@@ -94,20 +129,58 @@ export function MaintenancePopup() {
           </DialogTitle>
           
           <DialogDescription className="text-center text-base space-y-4 pt-4">
+            {updateVersion && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-center gap-2 p-2 bg-primary/10 rounded-lg border border-primary/30"
+              >
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary">Update Version: {updateVersion}</span>
+              </motion.div>
+            )}
+
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-muted-foreground"
             >
-              We're currently performing scheduled maintenance to improve your experience.
+              {description || "We're currently performing scheduled maintenance to improve your experience."}
             </motion.p>
+
+            {endTime && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="p-4 bg-muted/50 rounded-lg border border-border"
+              >
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Time Remaining</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: 'Days', value: countdown.days },
+                    { label: 'Hours', value: countdown.hours },
+                    { label: 'Min', value: countdown.minutes },
+                    { label: 'Sec', value: countdown.seconds }
+                  ].map((item) => (
+                    <div key={item.label} className="text-center">
+                      <div className="text-2xl font-bold text-primary">{String(item.value).padStart(2, '0')}</div>
+                      <div className="text-xs text-muted-foreground">{item.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
             
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-muted-foreground"
+              transition={{ delay: 0.4 }}
+              className="text-muted-foreground text-sm"
             >
               Please check back soon. We apologize for any inconvenience.
             </motion.p>
@@ -115,7 +188,7 @@ export function MaintenancePopup() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.5 }}
               className="pt-6 border-t border-border/50"
             >
               <Button
