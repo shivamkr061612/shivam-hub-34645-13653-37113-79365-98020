@@ -13,6 +13,9 @@ import { db, storage } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { Upload, Link, Crown } from 'lucide-react';
 
+// Sections that use simplified form (name, image, link, drive link only)
+const SIMPLIFIED_SECTIONS = ['assets', 'bundles', 'courses'];
+
 export function AdminUpload() {
   const [loading, setLoading] = useState(false);
   const [section, setSection] = useState('mods');
@@ -20,6 +23,7 @@ export function AdminUpload() {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [driveLink, setDriveLink] = useState('');
   const [uploadMethod, setUploadMethod] = useState<'file' | 'url'>('url');
   const [formData, setFormData] = useState({
     title: '',
@@ -28,6 +32,8 @@ export function AdminUpload() {
     size: '',
     isPremium: false
   });
+
+  const isSimplified = SIMPLIFIED_SECTIONS.includes(section);
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,14 +63,30 @@ export function AdminUpload() {
         thumbUrl = thumbnailUrl;
       }
 
-      // Add to Firestore
-      await addDoc(collection(db, section), {
-        ...formData,
+      // Prepare document data
+      const docData: Record<string, any> = {
+        title: formData.title,
         downloadUrl,
         thumbnail: thumbUrl,
         downloadCount: 0,
         createdAt: new Date().toISOString()
-      });
+      };
+
+      // Add extra fields for non-simplified sections
+      if (!isSimplified) {
+        docData.description = formData.description;
+        docData.version = formData.version;
+        docData.size = formData.size;
+        docData.isPremium = formData.isPremium;
+      }
+
+      // Add drive link for simplified sections
+      if (isSimplified && driveLink) {
+        docData.driveLink = driveLink;
+      }
+
+      // Add to Firestore
+      await addDoc(collection(db, section), docData);
 
       toast.success('Item uploaded successfully!');
       setFormData({ title: '', description: '', version: '', size: '', isPremium: false });
@@ -72,6 +94,7 @@ export function AdminUpload() {
       setThumbnail(null);
       setFileUrl('');
       setThumbnailUrl('');
+      setDriveLink('');
     } catch (error) {
       toast.error('Upload failed');
       console.error(error);
@@ -84,7 +107,7 @@ export function AdminUpload() {
     <Card>
       <CardHeader>
         <CardTitle>Upload Content</CardTitle>
-        <CardDescription>Add new items to Mods, Movies, or Courses</CardDescription>
+        <CardDescription>Add new items to Mods, Games, Assets, Bundles, Movies, or Courses</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleUpload} className="space-y-4">
@@ -106,7 +129,7 @@ export function AdminUpload() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title">Name *</Label>
             <Input
               id="title"
               value={formData.title}
@@ -115,48 +138,53 @@ export function AdminUpload() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              required
-            />
-          </div>
+          {/* Show description, version, size only for non-simplified sections */}
+          {!isSimplified && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  required
+                />
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="version">Version</Label>
-              <Input
-                id="version"
-                value={formData.version}
-                onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-              />
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="version">Version</Label>
+                  <Input
+                    id="version"
+                    value={formData.version}
+                    onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="size">Size</Label>
-              <Input
-                id="size"
-                value={formData.size}
-                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                placeholder="e.g., 150 MB"
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="size">Size</Label>
+                  <Input
+                    id="size"
+                    value={formData.size}
+                    onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                    placeholder="e.g., 150 MB"
+                  />
+                </div>
+              </div>
 
-          <div className="flex items-center space-x-2 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-            <Checkbox
-              id="isPremium"
-              checked={formData.isPremium}
-              onCheckedChange={(checked) => setFormData({ ...formData, isPremium: checked as boolean })}
-            />
-            <Label htmlFor="isPremium" className="flex items-center gap-2 cursor-pointer">
-              <Crown className="h-4 w-4 text-yellow-500" />
-              <span>Mark as Premium (Blue Tick Required)</span>
-            </Label>
-          </div>
+              <div className="flex items-center space-x-2 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <Checkbox
+                  id="isPremium"
+                  checked={formData.isPremium}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isPremium: checked as boolean })}
+                />
+                <Label htmlFor="isPremium" className="flex items-center gap-2 cursor-pointer">
+                  <Crown className="h-4 w-4 text-yellow-500" />
+                  <span>Mark as Premium (Blue Tick Required)</span>
+                </Label>
+              </div>
+            </>
+          )}
 
           <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as 'file' | 'url')}>
             <TabsList className="grid w-full grid-cols-2">
@@ -172,7 +200,7 @@ export function AdminUpload() {
 
             <TabsContent value="url" className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="thumbnailUrl">Thumbnail Image URL</Label>
+                <Label htmlFor="thumbnailUrl">Image URL</Label>
                 <Input
                   id="thumbnailUrl"
                   type="url"
@@ -183,7 +211,7 @@ export function AdminUpload() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fileUrl">Download File URL *</Label>
+                <Label htmlFor="fileUrl">Download Link *</Label>
                 <Input
                   id="fileUrl"
                   type="url"
@@ -193,11 +221,25 @@ export function AdminUpload() {
                   required
                 />
               </div>
+
+              {/* Drive link for simplified sections */}
+              {isSimplified && (
+                <div className="space-y-2">
+                  <Label htmlFor="driveLink">Drive Link (Optional)</Label>
+                  <Input
+                    id="driveLink"
+                    type="url"
+                    value={driveLink}
+                    onChange={(e) => setDriveLink(e.target.value)}
+                    placeholder="https://drive.google.com/..."
+                  />
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="file" className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="thumbnail">Thumbnail Image</Label>
+                <Label htmlFor="thumbnail">Image</Label>
                 <Input
                   id="thumbnail"
                   type="file"
@@ -215,6 +257,20 @@ export function AdminUpload() {
                   required
                 />
               </div>
+
+              {/* Drive link for simplified sections */}
+              {isSimplified && (
+                <div className="space-y-2">
+                  <Label htmlFor="driveLinkFile">Drive Link (Optional)</Label>
+                  <Input
+                    id="driveLinkFile"
+                    type="url"
+                    value={driveLink}
+                    onChange={(e) => setDriveLink(e.target.value)}
+                    placeholder="https://drive.google.com/..."
+                  />
+                </div>
+              )}
             </TabsContent>
           </Tabs>
 

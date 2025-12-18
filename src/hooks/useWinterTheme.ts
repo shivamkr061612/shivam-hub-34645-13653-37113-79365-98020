@@ -50,12 +50,16 @@ export function useWinterTheme() {
 
   // Apply color theme class
   useEffect(() => {
-    document.documentElement.classList.remove('cyber-pink-theme');
-    document.body.classList.remove('cyber-pink-theme');
+    // Remove all color theme classes
+    document.documentElement.classList.remove('cyber-pink-theme', 'cartoon-theme');
+    document.body.classList.remove('cyber-pink-theme', 'cartoon-theme');
     
     if (colorTheme === 'cyber-pink') {
       document.documentElement.classList.add('cyber-pink-theme');
       document.body.classList.add('cyber-pink-theme');
+    } else if (colorTheme === 'cartoon') {
+      document.documentElement.classList.add('cartoon-theme');
+      document.body.classList.add('cartoon-theme');
     }
   }, [colorTheme]);
 
