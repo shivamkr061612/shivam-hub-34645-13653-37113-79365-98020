@@ -13,6 +13,7 @@ export function AdminBlueTickSettings() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [settings, setSettings] = useState({
+    weeklyPrice: '',
     monthlyPrice: '',
     yearlyPrice: '',
     upiId: '',
@@ -73,7 +74,18 @@ export function AdminBlueTickSettings() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSave} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="weeklyPrice">Weekly Price (₹)</Label>
+              <Input
+                id="weeklyPrice"
+                type="number"
+                value={settings.weeklyPrice}
+                onChange={(e) => setSettings({ ...settings, weeklyPrice: e.target.value })}
+                placeholder="29"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="monthlyPrice">Monthly Price (₹)</Label>
               <Input

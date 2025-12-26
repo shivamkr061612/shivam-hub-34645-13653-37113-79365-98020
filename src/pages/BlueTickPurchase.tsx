@@ -7,10 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/contexts/AuthContext';
-import { doc, getDoc, addDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, query, where, getDocs, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { CheckCircle2, Loader2, CreditCard, Clock } from 'lucide-react';
+import { CheckCircle2, Loader2, CreditCard, Clock, Ticket, X } from 'lucide-react';
 import blueTick from '@/assets/blue-tick.png';
 
 const BlueTickPurchase = () => {
@@ -21,8 +21,11 @@ const BlueTickPurchase = () => {
   const [settings, setSettings] = useState<any>(null);
   const [plan, setPlan] = useState('monthly');
   const [transactionId, setTransactionId] = useState('');
-  const [step, setStep] = useState<'plan' | 'payment' | 'confirm'>('plan');
+  const [step, setStep] = useState<'plan' | 'coupon' | 'payment' | 'confirm'>('plan');
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; percentOff: number } | null>(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -67,16 +70,90 @@ const BlueTickPurchase = () => {
     }
   };
 
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    setApplyingCoupon(true);
+    try {
+      const q = query(
+        collection(db, 'coupons'),
+        where('code', '==', couponCode.toUpperCase())
+      );
+      const snapshot = await getDocs(q);
+      
+      if (snapshot.empty) {
+        toast.error('Invalid coupon code');
+        return;
+      }
+
+      const couponDoc = snapshot.docs[0];
+      const coupon = couponDoc.data();
+
+      if (coupon.usedCount >= coupon.maxUsers) {
+        toast.error('This coupon has expired');
+        return;
+      }
+
+      setAppliedCoupon({
+        code: coupon.code,
+        percentOff: coupon.percentOff
+      });
+      toast.success(`Coupon applied! ${coupon.percentOff}% off`);
+    } catch (error) {
+      toast.error('Failed to apply coupon');
+      console.error(error);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+  };
+
+  const getPrice = (planType: string) => {
+    let price = 0;
+    if (planType === 'weekly') price = parseFloat(settings?.weeklyPrice || '29');
+    else if (planType === 'monthly') price = parseFloat(settings?.monthlyPrice || '99');
+    else price = parseFloat(settings?.yearlyPrice || '999');
+
+    if (appliedCoupon) {
+      price = price - (price * appliedCoupon.percentOff / 100);
+    }
+    return Math.round(price);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // If coupon was applied, increment its usage
+      if (appliedCoupon) {
+        const q = query(
+          collection(db, 'coupons'),
+          where('code', '==', appliedCoupon.code)
+        );
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          await updateDoc(doc(db, 'coupons', snapshot.docs[0].id), {
+            usedCount: increment(1)
+          });
+        }
+      }
+
       await addDoc(collection(db, 'bluetick_requests'), {
         userEmail: user?.email,
         userId: user?.uid,
         plan,
         transactionId,
+        couponApplied: appliedCoupon?.code || null,
+        discountPercent: appliedCoupon?.percentOff || 0,
+        finalAmount: getPrice(plan),
         status: 'pending',
         createdAt: new Date().toISOString()
       });
@@ -147,7 +224,15 @@ const BlueTickPurchase = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <RadioGroup value={plan} onValueChange={setPlan}>
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:border-primary">
+                  <div className={`flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:border-primary ${plan === 'weekly' ? 'border-primary bg-primary/5' : ''}`}>
+                    <RadioGroupItem value="weekly" id="weekly" />
+                    <Label htmlFor="weekly" className="flex-1 cursor-pointer">
+                      <div className="font-semibold">Weekly Plan</div>
+                      <div className="text-2xl font-bold text-primary">₹{settings?.weeklyPrice || '29'}</div>
+                      <div className="text-sm text-muted-foreground">Billed weekly</div>
+                    </Label>
+                  </div>
+                  <div className={`flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:border-primary ${plan === 'monthly' ? 'border-primary bg-primary/5' : ''}`}>
                     <RadioGroupItem value="monthly" id="monthly" />
                     <Label htmlFor="monthly" className="flex-1 cursor-pointer">
                       <div className="font-semibold">Monthly Plan</div>
@@ -155,7 +240,7 @@ const BlueTickPurchase = () => {
                       <div className="text-sm text-muted-foreground">Billed monthly</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:border-primary">
+                  <div className={`flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:border-primary ${plan === 'yearly' ? 'border-primary bg-primary/5' : ''}`}>
                     <RadioGroupItem value="yearly" id="yearly" />
                     <Label htmlFor="yearly" className="flex-1 cursor-pointer">
                       <div className="font-semibold">Yearly Plan</div>
@@ -178,9 +263,84 @@ const BlueTickPurchase = () => {
                   </ul>
                 </div>
 
-                <Button onClick={() => setStep('payment')} className="w-full">
-                  Continue to Payment
+                <Button onClick={() => setStep('coupon')} className="w-full">
+                  Continue
                 </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {step === 'coupon' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="h-5 w-5" />
+                  Have a Coupon?
+                </CardTitle>
+                <CardDescription>Apply a discount coupon if you have one</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-green-600 dark:text-green-400">
+                        Coupon Applied: {appliedCoupon.code}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {appliedCoupon.percentOff}% discount applied
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={removeCoupon}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="couponCode">Coupon Code</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="couponCode"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="uppercase"
+                      />
+                      <Button onClick={applyCoupon} disabled={applyingCoupon}>
+                        {applyingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <span>Selected Plan:</span>
+                    <span className="font-semibold capitalize">{plan}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <span>Original Price:</span>
+                    <span>₹{plan === 'weekly' ? settings?.weeklyPrice : plan === 'monthly' ? settings?.monthlyPrice : settings?.yearlyPrice}</span>
+                  </div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between items-center mt-2 text-green-600 dark:text-green-400">
+                      <span>Discount ({appliedCoupon.percentOff}%):</span>
+                      <span>-₹{Math.round((plan === 'weekly' ? parseFloat(settings?.weeklyPrice || '29') : plan === 'monthly' ? parseFloat(settings?.monthlyPrice || '99') : parseFloat(settings?.yearlyPrice || '999')) * appliedCoupon.percentOff / 100)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center mt-2 pt-2 border-t font-bold text-lg">
+                    <span>Final Amount:</span>
+                    <span className="text-primary">₹{getPrice(plan)}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep('plan')} className="flex-1">
+                    Back
+                  </Button>
+                  <Button onClick={() => setStep('payment')} className="flex-1">
+                    Continue to Payment
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -207,12 +367,17 @@ const BlueTickPurchase = () => {
 
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
                   <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                    <strong>Amount to Pay:</strong> ₹{plan === 'monthly' ? settings?.monthlyPrice : settings?.yearlyPrice}
+                    <strong>Amount to Pay:</strong> ₹{getPrice(plan)}
+                    {appliedCoupon && (
+                      <span className="ml-2 text-green-600 dark:text-green-400">
+                        ({appliedCoupon.percentOff}% off applied)
+                      </span>
+                    )}
                   </p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep('plan')} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep('coupon')} className="flex-1">
                     Back
                   </Button>
                   <Button onClick={() => setStep('confirm')} className="flex-1">
