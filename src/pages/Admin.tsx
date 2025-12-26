@@ -20,6 +20,8 @@ import { AdminPopup } from '@/components/Admin/AdminPopup';
 import { AdminLiveChat } from '@/components/Admin/AdminLiveChat';
 import { AdminFeedback } from '@/components/Admin/AdminFeedback';
 import { AdminShayaris } from '@/components/Admin/AdminShayaris';
+import { AdminSectionSettings } from '@/components/Admin/AdminSectionSettings';
+import { AdminCoupons } from '@/components/Admin/AdminCoupons';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {
@@ -59,6 +61,8 @@ const Admin = () => {
             <TabsTrigger value="bluetick-requests" className="whitespace-nowrap text-sm">Blue Tick Requests</TabsTrigger>
             <TabsTrigger value="special-offers" className="whitespace-nowrap text-sm">Special Offers</TabsTrigger>
             <TabsTrigger value="popup" className="whitespace-nowrap text-sm">Popup</TabsTrigger>
+            <TabsTrigger value="sections" className="whitespace-nowrap text-sm">Sections</TabsTrigger>
+            <TabsTrigger value="coupons" className="whitespace-nowrap text-sm">Coupons</TabsTrigger>
             <TabsTrigger value="livechat" className="whitespace-nowrap text-sm">Live Chat</TabsTrigger>
             <TabsTrigger value="feedback" className="whitespace-nowrap text-sm">Feedback</TabsTrigger>
             <TabsTrigger value="shayaris" className="whitespace-nowrap text-sm">Shayaris</TabsTrigger>
@@ -122,6 +126,14 @@ const Admin = () => {
 
           <TabsContent value="popup">
             <AdminPopup />
+          </TabsContent>
+
+          <TabsContent value="sections">
+            <AdminSectionSettings />
+          </TabsContent>
+
+          <TabsContent value="coupons">
+            <AdminCoupons />
           </TabsContent>
 
           <TabsContent value="livechat">
