@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, Gamepad2, Layers, FolderArchive, Crown, Users, Smartphone } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageSquare, Shield, MessageCircle, Gamepad2, Layers, FolderArchive, Crown, Users } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChannelDialog } from '@/components/Channels/ChannelDialog';
@@ -31,7 +32,6 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
   };
 
   const menuItems = [
-    { icon: Smartphone, label: 'My Apps', path: '/#my-apps' },
     { icon: Package, label: 'Mods', path: '/mods' },
     { icon: Gamepad2, label: 'Games', path: '/games' },
     { icon: Layers, label: 'Assets', path: '/assets' },
@@ -54,47 +54,49 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
-          <nav className="mt-6 space-y-2">
-            {menuItems.map((item) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => handleNavigation(item.path, item.action, item.external)}
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                {item.label}
-              </Button>
-            ))}
-            
-            {showBuyBlueTickOption && (
-              <>
-                <div className="my-4 border-t" />
+          <ScrollArea className="h-[calc(100vh-120px)] mt-6">
+            <nav className="space-y-2 pr-4">
+              {menuItems.map((item) => (
                 <Button
+                  key={item.label}
                   variant="ghost"
-                  className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border border-yellow-500/30"
-                  onClick={() => handleNavigation('/buy-bluetick')}
+                  className="w-full justify-start"
+                  onClick={() => handleNavigation(item.path, item.action, item.external)}
                 >
-                  <Crown className="h-5 w-5 mr-3 text-yellow-500" />
-                  <span className="text-yellow-600 font-semibold">Get Blue Tick ✓</span>
+                  <item.icon className="h-5 w-5 mr-3" />
+                  {item.label}
                 </Button>
-              </>
-            )}
+              ))}
+              
+              {showBuyBlueTickOption && (
+                <>
+                  <div className="my-4 border-t" />
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border border-yellow-500/30"
+                    onClick={() => handleNavigation('/buy-bluetick')}
+                  >
+                    <Crown className="h-5 w-5 mr-3 text-yellow-500" />
+                    <span className="text-yellow-600 font-semibold">Get Blue Tick ✓</span>
+                  </Button>
+                </>
+              )}
 
-            {isAdmin && (
-              <>
-                <div className="my-4 border-t" />
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-primary"
-                  onClick={() => handleNavigation('/admin')}
-                >
-                  <Shield className="h-5 w-5 mr-3" />
-                  Admin Panel
-                </Button>
-              </>
-            )}
-          </nav>
+              {isAdmin && (
+                <>
+                  <div className="my-4 border-t" />
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-primary"
+                    onClick={() => handleNavigation('/admin')}
+                  >
+                    <Shield className="h-5 w-5 mr-3" />
+                    Admin Panel
+                  </Button>
+                </>
+              )}
+            </nav>
+          </ScrollArea>
         </SheetContent>
       </Sheet>
 

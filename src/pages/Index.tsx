@@ -3,7 +3,7 @@ import { QuoteCarousel } from '@/components/Home/QuoteCarousel';
 import { SectionCard } from '@/components/Home/SectionCard';
 import { ChannelPopup } from '@/components/Home/ChannelPopup';
 import { HomePopup } from '@/components/Home/HomePopup';
-import { MyAppsSection } from '@/components/Home/MyAppsSection';
+
 import { Package, Film, GraduationCap, Gamepad2, Layers, FolderArchive } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
@@ -105,10 +105,6 @@ const Index = () => {
           </motion.p>
         </motion.div>
 
-        {/* My Apps Section */}
-        <div id="my-apps">
-          <MyAppsSection />
-        </div>
 
         <motion.div
           initial={{ opacity: 0 }}
