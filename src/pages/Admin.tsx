@@ -24,6 +24,7 @@ import { AdminSectionSettings } from '@/components/Admin/AdminSectionSettings';
 import { AdminCoupons } from '@/components/Admin/AdminCoupons';
 import { AdminMyApps } from '@/components/Admin/AdminMyApps';
 import AdminPushNotifications from '@/components/Admin/AdminPushNotifications';
+import { AdminAvatars } from '@/components/Admin/AdminAvatars';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {

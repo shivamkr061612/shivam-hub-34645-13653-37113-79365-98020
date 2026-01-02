@@ -5,15 +5,18 @@ import { Header } from '@/components/Layout/Header';
 import { SocialFeed } from '@/components/Social/SocialFeed';
 import { UserProfilesBox } from '@/components/Social/UserProfilesBox';
 import { ProfileEditor } from '@/components/Social/ProfileEditor';
+import { ReelFeed } from '@/components/Social/ReelFeed';
+import { SocialChat } from '@/components/Social/SocialChat';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Home, User, Compass, PenSquare } from 'lucide-react';
+import { ArrowLeft, Home, User, Compass, MessageSquare, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Social() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('feed');
+  const [activeTab, setActiveTab] = useState('reels');
+  const [showChat, setShowChat] = useState(false);
 
   if (!user) {
     return (
@@ -28,7 +31,7 @@ export default function Social() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <Header />
       
       <main className="container max-w-6xl mx-auto px-4 py-6">
@@ -55,7 +58,11 @@ export default function Social() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="w-full grid grid-cols-3 bg-muted/50">
+              <TabsList className="w-full grid grid-cols-4 bg-muted/50">
+                <TabsTrigger value="reels" className="gap-2">
+                  <Play className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reels</span>
+                </TabsTrigger>
                 <TabsTrigger value="feed" className="gap-2">
                   <Home className="h-4 w-4" />
                   <span className="hidden sm:inline">Feed</span>
@@ -69,6 +76,10 @@ export default function Social() {
                   <span className="hidden sm:inline">Profile</span>
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="reels" className="space-y-4">
+                <ReelFeed />
+              </TabsContent>
 
               <TabsContent value="feed" className="space-y-4">
                 <SocialFeed />
@@ -98,6 +109,15 @@ export default function Social() {
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-2 lg:hidden z-40">
         <div className="flex justify-around">
           <Button
+            variant={activeTab === 'reels' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('reels')}
+            className="flex-col h-auto py-2"
+          >
+            <Play className="h-5 w-5" />
+            <span className="text-xs">Reels</span>
+          </Button>
+          <Button
             variant={activeTab === 'feed' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('feed')}
@@ -107,21 +127,12 @@ export default function Social() {
             <span className="text-xs">Feed</span>
           </Button>
           <Button
-            variant={activeTab === 'explore' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('explore')}
-            className="flex-col h-auto py-2"
-          >
-            <Compass className="h-5 w-5" />
-            <span className="text-xs">Explore</span>
-          </Button>
-          <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/live-chat')}
+            onClick={() => setShowChat(true)}
             className="flex-col h-auto py-2"
           >
-            <PenSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5" />
             <span className="text-xs">Chat</span>
           </Button>
           <Button
@@ -135,6 +146,9 @@ export default function Social() {
           </Button>
         </div>
       </div>
+
+      {/* Social Chat */}
+      <SocialChat isOpen={showChat} onClose={() => setShowChat(false)} />
     </div>
   );
 }
