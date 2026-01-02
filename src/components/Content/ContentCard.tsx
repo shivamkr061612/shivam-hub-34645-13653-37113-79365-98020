@@ -32,9 +32,14 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
   const isPremium = item.isPremium === true;
   const canAccess = !isPremium || (user && isVerified);
 
-  const handleDownloadClick = () => {
+  const handleCardClick = () => {
+    // Navigate to item details page with item data
+    navigate(`/item/${type}/${item.id || 'item'}`, { state: { item } });
+  };
+
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
     if (isPremium && !isVerified) {
-      // Redirect to blue tick purchase page
       navigate('/buy-bluetick');
       return;
     }
@@ -49,7 +54,10 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2 }}
       >
-        <Card className={`group relative overflow-hidden border-2 hover:border-primary transition-all ${viewMode === 'list' ? 'flex flex-row' : ''}`}>
+        <Card 
+          className={`group relative overflow-hidden border-2 hover:border-primary transition-all cursor-pointer ${viewMode === 'list' ? 'flex flex-row' : ''}`}
+          onClick={handleCardClick}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
           
           {item.thumbnail && (

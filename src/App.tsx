@@ -14,7 +14,6 @@ import { NotificationPrompt } from "@/components/Notifications/NotificationPromp
 import { useWinterTheme } from "@/hooks/useWinterTheme";
 import Index from "./pages/Index";
 import Mods from "./pages/Mods";
-
 import Courses from "./pages/Courses";
 import Games from "./pages/Games";
 import Assets from "./pages/Assets";
@@ -28,6 +27,7 @@ import NotFound from "./pages/NotFound";
 import LiveChat from "./pages/LiveChat";
 import BlueTickPurchase from "./pages/BlueTickPurchase";
 import Social from "./pages/Social";
+import ItemDetails from "./pages/ItemDetails";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +59,7 @@ const AppContent = () => {
           <Route path="/live-chat" element={<LiveChat />} />
           <Route path="/buy-bluetick" element={<BlueTickPurchase />} />
           <Route path="/social" element={<Social />} />
+          <Route path="/item/:type/:id" element={<ItemDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MaintenanceBlocker>

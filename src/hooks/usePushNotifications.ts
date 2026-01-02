@@ -95,54 +95,66 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
   // Request permission and get token
   const requestPermission = useCallback(async () => {
+    // Check basic browser support first
+    if (!('Notification' in window)) {
+      toast.error('Your browser does not support notifications');
+      return;
+    }
+
+    if (!('serviceWorker' in navigator)) {
+      toast.error('Service workers are not supported in this browser');
+      return;
+    }
+
     const supported = await isSupported();
     if (!supported) {
       toast.error('Push notifications are not supported in this browser');
       return;
     }
 
-    // Check if service worker is supported
-    if (!('serviceWorker' in navigator)) {
-      toast.error('Service workers are not supported in this browser');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // First check current permission status
-      if (Notification.permission === 'denied') {
-        toast.error('Notifications are blocked. Please enable them in your browser settings.');
+      // Check current permission - if denied, show helpful message
+      const currentPermission = Notification.permission;
+      
+      if (currentPermission === 'denied') {
+        toast.error('Notifications blocked! To enable: Open browser settings → Site permissions → Notifications → Allow for this site', {
+          duration: 8000,
+        });
         setPermission('denied');
         setIsLoading(false);
         return;
       }
 
-      // Register service worker first
+      // Register service worker
       let registration;
       try {
         registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
         console.log('Service Worker registered:', registration);
-        
-        // Wait for the service worker to be ready
         await navigator.serviceWorker.ready;
       } catch (swError) {
         console.error('Service Worker registration failed:', swError);
-        toast.error('Failed to register notification service. Please try again.');
+        toast.error('Failed to setup notifications. Please refresh and try again.');
         setIsLoading(false);
         return;
       }
 
-      // Request notification permission
+      // Request permission - this shows the browser prompt
       const notificationPermission = await Notification.requestPermission();
+      console.log('Permission result:', notificationPermission);
       setPermission(notificationPermission);
 
+      if (notificationPermission === 'denied') {
+        toast.error('Notifications blocked! Go to browser settings → Site permissions → Notifications to enable.', {
+          duration: 8000,
+        });
+        setIsLoading(false);
+        return;
+      }
+
       if (notificationPermission !== 'granted') {
-        if (notificationPermission === 'denied') {
-          toast.error('Notifications blocked. Enable in browser settings to receive updates.');
-        } else {
-          toast.info('Notification permission not granted');
-        }
+        toast.info('Notification permission not granted');
         setIsLoading(false);
         return;
       }
@@ -160,14 +172,13 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         await saveTokenToDatabase(fcmToken);
         toast.success('Notifications enabled! You will receive updates on your device.');
       } else {
-        toast.error('Failed to get notification token. Please try again.');
+        toast.error('Could not get notification token. Please try again.');
       }
     } catch (error: any) {
-      console.error('Error requesting notification permission:', error);
+      console.error('Notification error:', error);
       
-      // Provide more specific error messages
       if (error?.code === 'messaging/permission-blocked') {
-        toast.error('Notifications are blocked. Please enable them in your browser settings.');
+        toast.error('Notifications blocked in browser settings. Please enable manually.', { duration: 8000 });
       } else if (error?.code === 'messaging/unsupported-browser') {
         toast.error('Your browser does not support push notifications.');
       } else {
