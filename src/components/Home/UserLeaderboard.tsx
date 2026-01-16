@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { Trophy, Medal, Award, Download, Crown } from 'lucide-react';
 import { KingBadge } from '@/components/ui/KingBadge';
 import { motion } from 'framer-motion';
+import { DotLoader } from '@/components/ui/DotLoader';
 
 interface LeaderboardUser {
   id: string;
@@ -127,7 +128,7 @@ export function UserLeaderboard() {
     return (
       <Card className="border-2 border-primary/20">
         <CardContent className="py-8 text-center">
-          <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+          <DotLoader size="md" />
         </CardContent>
       </Card>
     );

@@ -4,6 +4,7 @@ import { SectionCard, sectionIcons } from '@/components/Home/SectionCard';
 import { ChannelPopup } from '@/components/Home/ChannelPopup';
 import { HomePopup } from '@/components/Home/HomePopup';
 import { PromotionalBanner } from '@/components/Home/PromotionalBanner';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
@@ -52,6 +53,7 @@ const Index = () => {
   ];
 
   return (
+    <PageTransition>
     <div className="min-h-screen relative overflow-hidden">
       <Header />
       <ChannelPopup />
@@ -171,6 +173,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </PageTransition>
   );
 };
 

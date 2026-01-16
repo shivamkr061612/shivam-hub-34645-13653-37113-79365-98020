@@ -75,10 +75,10 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                   <Button
                     variant="ghost"
                     className="w-full justify-start bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border border-yellow-500/30"
-                    onClick={() => handleNavigation('/buy-bluetick')}
+                    onClick={() => handleNavigation('/buy-king-badge')}
                   >
                     <Crown className="h-5 w-5 mr-3 text-yellow-500" />
-                    <span className="text-yellow-600 font-semibold">Get Blue Tick ✓</span>
+                    <span className="text-yellow-600 font-semibold">Get King Badge</span>
                   </Button>
                 </>
               )}

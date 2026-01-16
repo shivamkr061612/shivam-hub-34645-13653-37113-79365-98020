@@ -13,6 +13,7 @@ import { User, Save, Sparkles, Eye, EyeOff, Clock, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { maleAvatars, femaleAvatars, getAvatarById } from './avatars';
+import { DotLoader } from '@/components/ui/DotLoader';
 
 interface ProfileData {
   displayName: string;
@@ -160,7 +161,7 @@ export function ProfileEditor() {
     return (
       <Card className="p-8">
         <div className="flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+          <DotLoader size="md" />
         </div>
       </Card>
     );
