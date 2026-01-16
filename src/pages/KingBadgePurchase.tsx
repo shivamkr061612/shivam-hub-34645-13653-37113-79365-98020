@@ -10,7 +10,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, getDoc, addDoc, collection, query, where, getDocs, updateDoc, increment, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { CheckCircle2, Loader2, CreditCard, Clock, Ticket, X, Sparkles, Crown } from 'lucide-react';
+import { CheckCircle2, CreditCard, Clock, Ticket, X, Sparkles, Crown } from 'lucide-react';
+import { DotLoader } from '@/components/ui/DotLoader';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 interface SpecialOffer {
   id: string;
@@ -195,7 +197,7 @@ const BlueTickPurchase = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="flex justify-center items-center py-20">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <DotLoader size="lg" />
         </div>
       </div>
     );
@@ -361,7 +363,7 @@ const BlueTickPurchase = () => {
                         className="uppercase"
                       />
                       <Button onClick={applyCoupon} disabled={applyingCoupon}>
-                        {applyingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+                        {applyingCoupon ? <DotLoader size="sm" /> : 'Apply'}
                       </Button>
                     </div>
                   </div>

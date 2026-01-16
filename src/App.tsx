@@ -25,7 +25,7 @@ import DownloadCallback from "./pages/DownloadCallback";
 import VerificationSuccess from "./pages/VerificationSuccess";
 import NotFound from "./pages/NotFound";
 import LiveChat from "./pages/LiveChat";
-import BlueTickPurchase from "./pages/BlueTickPurchase";
+import KingBadgePurchase from "./pages/KingBadgePurchase";
 import Social from "./pages/Social";
 import ItemDetails from "./pages/ItemDetails";
 import Leaderboard from "./pages/Leaderboard";
@@ -58,7 +58,7 @@ const AppContent = () => {
           <Route path="/download-callback" element={<DownloadCallback />} />
           <Route path="/verification-success" element={<VerificationSuccess />} />
           <Route path="/live-chat" element={<LiveChat />} />
-          <Route path="/buy-bluetick" element={<BlueTickPurchase />} />
+          <Route path="/buy-king-badge" element={<KingBadgePurchase />} />
           <Route path="/social" element={<Social />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/item/:type/:id" element={<ItemDetails />} />

@@ -85,44 +85,60 @@ export function PromotionalBanner() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="relative w-full max-w-4xl mx-auto"
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        duration: 0.6, 
+        ease: [0.4, 0, 0.2, 1]
+      }}
+      className="relative w-full max-w-4xl mx-auto perspective-1000"
     >
-      {/* Main Banner Container with gradient border */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 p-[2px]">
-        <div className="relative bg-card rounded-2xl overflow-hidden">
+      {/* Main Banner Container with bold border and 3D effect */}
+      <motion.div 
+        className="relative rounded-2xl overflow-hidden border-4 border-primary shadow-2xl"
+        whileHover={{ 
+          rotateX: 2,
+          rotateY: -2,
+          scale: 1.02,
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+        }}
+        transition={{ duration: 0.3 }}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        <div className="relative bg-card rounded-xl overflow-hidden">
           {/* Banner Content */}
-          <div className="relative h-44 md:h-56 overflow-hidden">
+          <div className="relative aspect-[16/7] overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, scale: 1.1, rotateY: 10 }}
+                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                exit={{ opacity: 0, scale: 0.95, rotateY: -10 }}
+                transition={{ 
+                  duration: 0.6, 
+                  ease: [0.4, 0, 0.2, 1]
+                }}
                 className="absolute inset-0 cursor-pointer"
                 onClick={() => handleBannerClick(banners[currentIndex]?.link)}
               >
-                {/* Background Image */}
+                {/* Background Image - full cover */}
                 <div className="absolute inset-0">
                   <img
                     src={banners[currentIndex]?.imageUrl}
                     alt={banners[currentIndex]?.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 </div>
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
                   <motion.h3
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="text-xl md:text-2xl font-bold mb-2 flex items-center gap-2"
+                    className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2"
                   >
                     {banners[currentIndex]?.name}
                     <ExternalLink className="h-4 w-4 opacity-70" />
@@ -138,9 +154,6 @@ export function PromotionalBanner() {
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Bottom Fade Effect */}
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent pointer-events-none" />
           </div>
 
           {/* Navigation Arrows */}
@@ -149,7 +162,7 @@ export function PromotionalBanner() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full h-10 w-10"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full h-10 w-10 backdrop-blur-sm border border-white/20"
                 onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
               >
                 <ChevronLeft className="h-6 w-6" />
@@ -157,7 +170,7 @@ export function PromotionalBanner() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full h-10 w-10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full h-10 w-10 backdrop-blur-sm border border-white/20"
                 onClick={(e) => { e.stopPropagation(); goToNext(); }}
               >
                 <ChevronRight className="h-6 w-6" />
@@ -167,7 +180,7 @@ export function PromotionalBanner() {
 
           {/* Dots Indicator */}
           {banners.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm">
               {banners.map((_, index) => (
                 <button
                   key={index}
@@ -182,7 +195,7 @@ export function PromotionalBanner() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

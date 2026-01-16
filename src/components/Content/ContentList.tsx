@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ContentCard } from './ContentCard';
 import { Search, Grid, List } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DotLoader } from '@/components/ui/DotLoader';
 
 interface ContentListProps {
   title: string;
@@ -83,7 +84,7 @@ export function ContentList({ title, items, loading, type }: ContentListProps) {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+          <DotLoader size="lg" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       ) : filteredItems.length === 0 ? (
