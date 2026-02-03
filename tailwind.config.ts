@@ -58,6 +58,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom color utilities
+        "custom-red": "hsl(348 83% 55%)",
+        "custom-blue": "hsl(210 100% 50%)",
+        "custom-green": "hsl(145 65% 45%)",
+        "custom-orange": "hsl(35 95% 55%)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -72,6 +77,7 @@ export default {
       boxShadow: {
         'glow': 'var(--shadow-glow)',
         'card': 'var(--shadow-card)',
+        'neon': 'var(--shadow-neon)',
       },
       keyframes: {
         "accordion-down": {
