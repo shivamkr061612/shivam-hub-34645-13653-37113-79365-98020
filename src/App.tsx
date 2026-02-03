@@ -30,6 +30,10 @@ import Social from "./pages/Social";
 import ItemDetails from "./pages/ItemDetails";
 import Leaderboard from "./pages/Leaderboard";
 import TechAI from "./pages/TechAI";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import TermsConditions from "./pages/TermsConditions";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +55,6 @@ const AppContent = () => {
           <Route path="/games" element={<Games />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/bundles" element={<Bundles />} />
-          
           <Route path="/courses" element={<Courses />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/request-mod" element={<RequestMod />} />
@@ -61,10 +64,15 @@ const AppContent = () => {
           <Route path="/live-chat" element={<LiveChat />} />
           <Route path="/buy-king-badge" element={<KingBadgePurchase />} />
           <Route path="/social" element={<Social />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/tech-ai" element={<TechAI />} />
-              <Route path="/item/:type/:id" element={<ItemDetails />} />
-              <Route path="*" element={<NotFound />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/tech-ai" element={<TechAI />} />
+          <Route path="/item/:type/:id" element={<ItemDetails />} />
+          {/* Legal Pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </MaintenanceBlocker>
     </>
