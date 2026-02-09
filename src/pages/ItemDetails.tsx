@@ -118,7 +118,8 @@ export default function ItemDetails() {
       navigate('/buy-king-badge');
       return;
     }
-    setShowDownload(true);
+    // Navigate to download page with versions
+    navigate(`/download/${type}/${item.id}`, { state: { item } });
   };
 
   const handleShare = async () => {
