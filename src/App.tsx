@@ -29,6 +29,7 @@ import LiveChat from "./pages/LiveChat";
 import KingBadgePurchase from "./pages/KingBadgePurchase";
 import Social from "./pages/Social";
 import ItemDetails from "./pages/ItemDetails";
+import DownloadPage from "./pages/DownloadPage";
 import Leaderboard from "./pages/Leaderboard";
 import TechAI from "./pages/TechAI";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -76,6 +77,7 @@ const AppContent = () => {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/tech-ai" element={<TechAI />} />
             <Route path="/item/:type/:id" element={<ItemDetails />} />
+            <Route path="/download/:type/:id" element={<DownloadPage />} />
             {/* Legal Pages */}
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/about-us" element={<AboutUs />} />
