@@ -18,6 +18,7 @@ export function AdminWebsiteSettings() {
     aboutUs: '',
     whatWeOffer: '',
     channelLink: '',
+    telegramLink: '',
     keyGenerationEnabled: true
   });
 
@@ -123,6 +124,17 @@ export function AdminWebsiteSettings() {
             value={formData.channelLink}
             onChange={(e) => setFormData({ ...formData, channelLink: e.target.value })}
             placeholder="https://youtube.com/@yourchannel"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="telegramLink">Telegram Link</Label>
+          <Input
+            id="telegramLink"
+            type="url"
+            value={formData.telegramLink || ''}
+            onChange={(e) => setFormData({ ...formData, telegramLink: e.target.value })}
+            placeholder="https://t.me/yourchannel"
           />
         </div>
 

@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Search } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChannelDialog } from '@/components/Channels/ChannelDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useTheme } from 'next-themes';
+import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 
 interface NavigationDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Colorful grid menu items matching getmodsapk.com style
 const mainGridItems = [
   { icon: Home, label: 'Home', path: '/', bgClass: 'bg-gradient-to-br from-blue-400 to-blue-600' },
   { icon: Gamepad2, label: 'Games', path: '/games', bgClass: 'bg-gradient-to-br from-red-400 to-red-600' },
@@ -30,8 +29,8 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
   const { user, isAdmin } = useAuth();
   const { isVerified } = useVerification();
   const { theme, setTheme } = useTheme();
+  const { settings } = useWebsiteSettings();
   const [showChannels, setShowChannels] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleNavigation = (path?: string, action?: string, external?: boolean) => {
     if (action === 'channels') {
@@ -42,15 +41,6 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
     } else if (path) {
       navigate(path);
       onOpenChange(false);
-    }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      onOpenChange(false);
-      setSearchQuery('');
     }
   };
 
@@ -65,33 +55,13 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="left" className="w-[320px] p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-4">
-            <SheetTitle className="text-left text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent flex items-center gap-2">
-              <img src="/favicon.ico" alt="Logo" className="w-8 h-8 rounded-lg" />
-              TS HUB
+            <SheetTitle className="text-left text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent flex items-center gap-3">
+              <img src={settings.logoUrl} alt="Logo" className="w-10 h-10 rounded-full object-cover" />
+              {settings.siteName}
             </SheetTitle>
           </SheetHeader>
 
           <ScrollArea className="h-[calc(100vh-100px)] px-4">
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="mb-6 px-2">
-              <div className="relative">
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for apps, games..."
-                  className="pr-10 rounded-full border-2 border-border focus:border-primary"
-                />
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-primary"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-            </form>
-
             {/* Colorful Grid Menu */}
             <div className="grid grid-cols-2 gap-3 px-2 mb-6">
               {mainGridItems.map((item) => (
@@ -107,7 +77,7 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
               ))}
             </div>
 
-            {/* Dark Mode Toggle */}
+            {/* Tech AI + Dark Mode Toggle */}
             <div className="grid grid-cols-2 gap-3 px-2 mb-6">
               <Button
                 variant="ghost"
@@ -182,13 +152,13 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
               </div>
             )}
 
-            {/* External Links */}
+            {/* External Links - Telegram (admin-configurable) + WhatsApp (opens contact support) */}
             <div className="px-2 mb-4 flex justify-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:opacity-90 text-white shadow-lg"
-                onClick={() => window.open('https://t.me/techshivam', '_blank')}
+                onClick={() => window.open(settings.telegramLink || 'https://t.me/techshivam', '_blank')}
               >
                 <Send className="h-6 w-6" />
               </Button>
@@ -196,7 +166,10 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                 variant="ghost"
                 size="icon"
                 className="h-14 w-14 rounded-full bg-gradient-to-br from-green-400 to-green-600 hover:opacity-90 text-white shadow-lg"
-                onClick={() => window.open('https://wa.me/919876543210', '_blank')}
+                onClick={() => {
+                  navigate('/contact');
+                  onOpenChange(false);
+                }}
               >
                 <MessageCircle className="h-6 w-6" />
               </Button>

@@ -9,6 +9,7 @@ interface WebsiteSettings {
   aboutUs: string;
   whatWeOffer: string;
   channelLink: string;
+  telegramLink: string;
   keyGenerationEnabled: boolean;
 }
 
@@ -19,6 +20,7 @@ const defaultSettings: WebsiteSettings = {
   aboutUs: 'Welcome to our platform where you can discover amazing mods, movies, and courses. We are dedicated to providing quality content for our community.',
   whatWeOffer: 'Game Mods & Enhancements|Movies Collection|Educational Courses|Regular Updates',
   channelLink: 'https://youtube.com/@techshivam',
+  telegramLink: 'https://t.me/techshivam',
   keyGenerationEnabled: true
 };
 
