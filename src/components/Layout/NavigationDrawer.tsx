@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Upload, Megaphone } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -95,6 +95,31 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                 {theme === 'dark' ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7" />}
                 <span className="font-semibold">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </Button>
+            </div>
+
+            {/* User Actions */}
+            <div className="px-2 mb-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Upload & Earn
+              </p>
+              <div className="space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start hover:bg-primary/10 rounded-xl h-12"
+                  onClick={() => handleNavigation('/user-upload')}
+                >
+                  <Upload className="h-5 w-5 mr-3 text-blue-500" />
+                  Upload Content
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start hover:bg-primary/10 rounded-xl h-12"
+                  onClick={() => handleNavigation('/promotions')}
+                >
+                  <Megaphone className="h-5 w-5 mr-3 text-orange-500" />
+                  Promote Channel
+                </Button>
+              </div>
             </div>
 
             {/* Community Section */}

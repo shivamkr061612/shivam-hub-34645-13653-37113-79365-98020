@@ -36,6 +36,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import TermsConditions from "./pages/TermsConditions";
+import UserUpload from "./pages/UserUpload";
+import Promotions from "./pages/Promotions";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +80,8 @@ const AppContent = () => {
             <Route path="/tech-ai" element={<TechAI />} />
             <Route path="/item/:type/:id" element={<ItemDetails />} />
             <Route path="/download/:type/:id" element={<DownloadPage />} />
+            <Route path="/user-upload" element={<UserUpload />} />
+            <Route path="/promotions" element={<Promotions />} />
             {/* Legal Pages */}
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/about-us" element={<AboutUs />} />

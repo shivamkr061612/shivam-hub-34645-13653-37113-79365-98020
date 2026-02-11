@@ -91,7 +91,7 @@ export function PromotionalBanner() {
         duration: 0.6, 
         ease: [0.4, 0, 0.2, 1]
       }}
-      className="relative w-full max-w-4xl mx-auto perspective-1000"
+      className="relative w-full mx-auto perspective-1000"
     >
       {/* Main Banner Container with bold border and 3D effect */}
       <motion.div 
@@ -107,7 +107,7 @@ export function PromotionalBanner() {
       >
         <div className="relative bg-card rounded-xl overflow-hidden">
           {/* Banner Content */}
-          <div className="relative aspect-[16/7] overflow-hidden">
+          <div className="relative aspect-[16/6] sm:aspect-[16/7] overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -127,6 +127,8 @@ export function PromotionalBanner() {
                     src={banners[currentIndex]?.imageUrl}
                     alt={banners[currentIndex]?.name}
                     className="w-full h-full object-cover object-center"
+                    loading="lazy"
+                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                   />
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
