@@ -83,7 +83,7 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="max-w-3xl mx-auto"
+            className="w-full max-w-5xl mx-auto"
           >
             <PromotionalBanner />
           </motion.div>

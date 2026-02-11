@@ -27,6 +27,8 @@ import AdminPushNotifications from '@/components/Admin/AdminPushNotifications';
 import { AdminAvatars } from '@/components/Admin/AdminAvatars';
 import AdminKeyGeneration from '@/components/Admin/AdminKeyGeneration';
 import { AdminPromotionalBanners } from '@/components/Admin/AdminPromotionalBanners';
+import { AdminUserUploads } from '@/components/Admin/AdminUserUploads';
+import { AdminPromotionSettings } from '@/components/Admin/AdminPromotionSettings';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {
@@ -76,6 +78,8 @@ const Admin = () => {
             <TabsTrigger value="avatars" className="whitespace-nowrap text-sm">Avatars</TabsTrigger>
             <TabsTrigger value="key-generation" className="whitespace-nowrap text-sm">Generate Keys</TabsTrigger>
             <TabsTrigger value="promotional-banners" className="whitespace-nowrap text-sm">Promo Banners</TabsTrigger>
+            <TabsTrigger value="user-uploads" className="whitespace-nowrap text-sm">User Uploads</TabsTrigger>
+            <TabsTrigger value="promotion-settings" className="whitespace-nowrap text-sm">Promotions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload">
@@ -176,6 +180,14 @@ const Admin = () => {
 
           <TabsContent value="promotional-banners">
             <AdminPromotionalBanners />
+          </TabsContent>
+
+          <TabsContent value="user-uploads">
+            <AdminUserUploads />
+          </TabsContent>
+
+          <TabsContent value="promotion-settings">
+            <AdminPromotionSettings />
           </TabsContent>
         </Tabs>
 

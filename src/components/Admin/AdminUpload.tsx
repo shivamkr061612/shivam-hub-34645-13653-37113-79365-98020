@@ -20,6 +20,9 @@ interface Version {
   link: string;
 }
 
+// Sections that use simplified form (no mod features, no app name, no category, no requirements, no platform)
+const SIMPLIFIED_SECTIONS = ['courses', 'bundles', 'assets'];
+
 export function AdminUpload() {
   const [loading, setLoading] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
@@ -49,8 +52,18 @@ export function AdminUpload() {
     platform: 'Android',
     modFeatures: '',
     rating: '',
-    votes: ''
+    votes: '',
+    infoLabel: '', // For courses: "Course Info", bundles: "Bundle Info", assets: "Asset Info"
   });
+
+  const isSimplified = SIMPLIFIED_SECTIONS.includes(section);
+
+  const getInfoLabel = () => {
+    if (section === 'courses') return 'Course Info';
+    if (section === 'bundles') return 'Reel Bundle Info';
+    if (section === 'assets') return 'Asset Info';
+    return 'Info';
+  };
 
   const generateDescription = async () => {
     if (!formData.title.trim()) {
@@ -126,7 +139,6 @@ export function AdminUpload() {
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploadingThumbnail(true);
     try {
       const url = await uploadToImgBB(file);
@@ -143,7 +155,6 @@ export function AdminUpload() {
   const handleItemImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploadingImage(true);
     try {
       const url = await uploadToImgBB(file);
@@ -160,7 +171,6 @@ export function AdminUpload() {
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploadingScreenshot(true);
     try {
       const url = await uploadToImgBB(file);
@@ -206,7 +216,6 @@ export function AdminUpload() {
           await uploadBytes(fileRef, file);
           downloadUrl = await getDownloadURL(fileRef);
         }
-
         if (thumbnail) {
           thumbUrl = await uploadToImgBB(thumbnail);
         }
@@ -214,10 +223,7 @@ export function AdminUpload() {
         downloadUrl = fileUrl;
       }
 
-      // Filter out empty versions
       const validVersions = versions.filter(v => v.name.trim() && v.link.trim());
-      
-      // If no valid versions but we have a download URL, create a default version
       const finalVersions = validVersions.length > 0 ? validVersions : 
         downloadUrl ? [{ name: `${formData.title} ${formData.version || 'v1.0'}`, size: formData.size || 'Unknown', link: downloadUrl }] : [];
 
@@ -229,20 +235,28 @@ export function AdminUpload() {
         downloadCount: 0,
         createdAt: new Date().toISOString(),
         description: formData.description,
-        version: formData.version,
-        size: formData.size,
         isPremium: formData.isPremium,
-        appName: formData.appName || formData.title.split(' ')[0],
         publisher: formData.publisher || formData.title.split(' ')[0],
-        category: formData.category || 'App',
-        requirements: formData.requirements || 'Android 5.0+',
-        platform: formData.platform || 'Android',
-        modFeatures: formData.modFeatures,
         rating: formData.rating ? parseFloat(formData.rating) : 4.9,
         votes: formData.votes ? parseInt(formData.votes) : Math.floor(Math.random() * 50000) + 10000,
         screenshots: screenshots,
-        versions: finalVersions
+        versions: finalVersions,
       };
+
+      if (isSimplified) {
+        // Simplified fields for courses, bundles, assets
+        docData.infoLabel = getInfoLabel();
+        docData.infoText = formData.infoLabel;
+      } else {
+        // Full fields for mods, games
+        docData.version = formData.version;
+        docData.size = formData.size;
+        docData.appName = formData.appName || formData.title.split(' ')[0];
+        docData.category = formData.category || 'App';
+        docData.requirements = formData.requirements || 'Android 5.0+';
+        docData.platform = formData.platform || 'Android';
+        docData.modFeatures = formData.modFeatures;
+      }
 
       if (driveLink) {
         docData.driveLink = driveLink;
@@ -254,7 +268,7 @@ export function AdminUpload() {
       setFormData({ 
         title: '', description: '', version: '', size: '', isPremium: false,
         appName: '', publisher: '', category: '', requirements: '', platform: 'Android',
-        modFeatures: '', rating: '', votes: ''
+        modFeatures: '', rating: '', votes: '', infoLabel: ''
       });
       setFile(null);
       setThumbnail(null);
@@ -290,13 +304,14 @@ export function AdminUpload() {
                 <SelectItem value="mods">Mods</SelectItem>
                 <SelectItem value="games">Games</SelectItem>
                 <SelectItem value="assets">Assets</SelectItem>
-                <SelectItem value="bundles">Bundles</SelectItem>
+                <SelectItem value="bundles">Reel Bundles</SelectItem>
                 <SelectItem value="movies">Movies</SelectItem>
                 <SelectItem value="courses">Courses</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
+          {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="title">Name *</Label>
             <Input
@@ -307,6 +322,7 @@ export function AdminUpload() {
             />
           </div>
 
+          {/* Description with AI */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="description">Description *</Label>
@@ -335,132 +351,152 @@ export function AdminUpload() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="version">Version</Label>
-              <Input
-                id="version"
-                value={formData.version}
-                onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                placeholder="e.g., 1.0.0"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="size">Size</Label>
-              <Input
-                id="size"
-                value={formData.size}
-                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                placeholder="e.g., 150 MB"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="appName">App Name</Label>
-              <Input
-                id="appName"
-                value={formData.appName}
-                onChange={(e) => setFormData({ ...formData, appName: e.target.value })}
-                placeholder="App display name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="publisher">Publisher</Label>
-              <Input
-                id="publisher"
-                value={formData.publisher}
-                onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                placeholder="Publisher name"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Entertainment">Entertainment</SelectItem>
-                  <SelectItem value="Music">Music</SelectItem>
-                  <SelectItem value="Video">Video</SelectItem>
-                  <SelectItem value="Social">Social</SelectItem>
-                  <SelectItem value="Tools">Tools</SelectItem>
-                  <SelectItem value="Games">Games</SelectItem>
-                  <SelectItem value="Education">Education</SelectItem>
-                  <SelectItem value="Productivity">Productivity</SelectItem>
-                  <SelectItem value="Photography">Photography</SelectItem>
-                  <SelectItem value="Communication">Communication</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="platform">Platform</Label>
-              <Select value={formData.platform} onValueChange={(v) => setFormData({ ...formData, platform: v })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Android">Android</SelectItem>
-                  <SelectItem value="iOS">iOS</SelectItem>
-                  <SelectItem value="Windows">Windows</SelectItem>
-                  <SelectItem value="Mac">Mac</SelectItem>
-                  <SelectItem value="Cross-platform">Cross-platform</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="requirements">Requirements</Label>
-              <Input
-                id="requirements"
-                value={formData.requirements}
-                onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                placeholder="e.g., Android 5.0+"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label htmlFor="rating">Rating</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  step="0.1"
-                  min="1"
-                  max="5"
-                  value={formData.rating}
-                  onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
-                  placeholder="4.9"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="votes">Votes</Label>
-                <Input
-                  id="votes"
-                  type="number"
-                  value={formData.votes}
-                  onChange={(e) => setFormData({ ...formData, votes: e.target.value })}
-                  placeholder="10000"
-                />
-              </div>
-            </div>
-          </div>
-
+          {/* Publisher - always shown */}
           <div className="space-y-2">
-            <Label htmlFor="modFeatures">MOD Features (separate with |)</Label>
-            <Textarea
-              id="modFeatures"
-              value={formData.modFeatures}
-              onChange={(e) => setFormData({ ...formData, modFeatures: e.target.value })}
-              placeholder="VIP Unlocked|Ads Removed|Premium Features|No Login Required"
-              className="min-h-[80px]"
+            <Label htmlFor="publisher">Publisher</Label>
+            <Input
+              id="publisher"
+              value={formData.publisher}
+              onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+              placeholder="Publisher name"
             />
+          </div>
+
+          {/* Simplified section info */}
+          {isSimplified && (
+            <div className="space-y-2">
+              <Label htmlFor="infoLabel">{getInfoLabel()}</Label>
+              <Textarea
+                id="infoLabel"
+                value={formData.infoLabel}
+                onChange={(e) => setFormData({ ...formData, infoLabel: e.target.value })}
+                placeholder={`Enter ${getInfoLabel().toLowerCase()} details...`}
+                className="min-h-[80px]"
+              />
+            </div>
+          )}
+
+          {/* Full fields for mods/games only */}
+          {!isSimplified && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="version">Version</Label>
+                  <Input
+                    id="version"
+                    value={formData.version}
+                    onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+                    placeholder="e.g., 1.0.0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="size">Size</Label>
+                  <Input
+                    id="size"
+                    value={formData.size}
+                    onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                    placeholder="e.g., 150 MB"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="appName">App Name</Label>
+                  <Input
+                    id="appName"
+                    value={formData.appName}
+                    onChange={(e) => setFormData({ ...formData, appName: e.target.value })}
+                    placeholder="App display name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Entertainment">Entertainment</SelectItem>
+                      <SelectItem value="Music">Music</SelectItem>
+                      <SelectItem value="Video">Video</SelectItem>
+                      <SelectItem value="Social">Social</SelectItem>
+                      <SelectItem value="Tools">Tools</SelectItem>
+                      <SelectItem value="Games">Games</SelectItem>
+                      <SelectItem value="Education">Education</SelectItem>
+                      <SelectItem value="Productivity">Productivity</SelectItem>
+                      <SelectItem value="Photography">Photography</SelectItem>
+                      <SelectItem value="Communication">Communication</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="requirements">Requirements</Label>
+                  <Input
+                    id="requirements"
+                    value={formData.requirements}
+                    onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                    placeholder="e.g., Android 5.0+"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="platform">Platform</Label>
+                  <Select value={formData.platform} onValueChange={(v) => setFormData({ ...formData, platform: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Android">Android</SelectItem>
+                      <SelectItem value="iOS">iOS</SelectItem>
+                      <SelectItem value="Windows">Windows</SelectItem>
+                      <SelectItem value="Mac">Mac</SelectItem>
+                      <SelectItem value="Cross-platform">Cross-platform</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modFeatures">MOD Features (separate with |)</Label>
+                <Textarea
+                  id="modFeatures"
+                  value={formData.modFeatures}
+                  onChange={(e) => setFormData({ ...formData, modFeatures: e.target.value })}
+                  placeholder="VIP Unlocked|Ads Removed|Premium Features|No Login Required"
+                  className="min-h-[80px]"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Rating & Votes - always shown */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="rating">Rating</Label>
+              <Input
+                id="rating"
+                type="number"
+                step="0.1"
+                min="1"
+                max="5"
+                value={formData.rating}
+                onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
+                placeholder="4.9"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="votes">Votes</Label>
+              <Input
+                id="votes"
+                type="number"
+                value={formData.votes}
+                onChange={(e) => setFormData({ ...formData, votes: e.target.value })}
+                placeholder="10000"
+              />
+            </div>
           </div>
 
           {/* Thumbnail Upload */}
@@ -473,18 +509,13 @@ export function AdminUpload() {
                 </div>
               )}
               <div className="flex-1">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailUpload}
-                  disabled={uploadingThumbnail}
-                />
+                <Input type="file" accept="image/*" onChange={handleThumbnailUpload} disabled={uploadingThumbnail} />
                 {uploadingThumbnail && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
               </div>
             </div>
           </div>
 
-          {/* Separate Item Image Upload */}
+          {/* Item Image */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Image className="h-4 w-4" />
@@ -497,12 +528,7 @@ export function AdminUpload() {
                 </div>
               )}
               <div className="flex-1">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleItemImageUpload}
-                  disabled={uploadingImage}
-                />
+                <Input type="file" accept="image/*" onChange={handleItemImageUpload} disabled={uploadingImage} />
                 {uploadingImage && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
                 <p className="text-xs text-muted-foreground mt-1">Upload a separate image for the item details page</p>
               </div>
@@ -529,18 +555,12 @@ export function AdminUpload() {
               ))}
             </div>
             <div className="flex items-center gap-2">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleScreenshotUpload}
-                disabled={uploadingScreenshot}
-                className="flex-1"
-              />
+              <Input type="file" accept="image/*" onChange={handleScreenshotUpload} disabled={uploadingScreenshot} className="flex-1" />
               {uploadingScreenshot && <Loader2 className="h-4 w-4 animate-spin" />}
             </div>
           </div>
 
-          {/* Versions Section */}
+          {/* Versions */}
           <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">Download Versions</Label>
@@ -552,45 +572,26 @@ export function AdminUpload() {
               <div key={index} className="grid grid-cols-12 gap-2 items-end p-3 border rounded-lg bg-background">
                 <div className="col-span-4 space-y-1">
                   <Label className="text-xs">Version Name</Label>
-                  <Input
-                    placeholder="e.g., v8.16.1 MOD APK"
-                    value={version.name}
-                    onChange={(e) => updateVersion(index, 'name', e.target.value)}
-                  />
+                  <Input placeholder="e.g., v8.16.1" value={version.name} onChange={(e) => updateVersion(index, 'name', e.target.value)} />
                 </div>
                 <div className="col-span-2 space-y-1">
                   <Label className="text-xs">Size</Label>
-                  <Input
-                    placeholder="75 MB"
-                    value={version.size}
-                    onChange={(e) => updateVersion(index, 'size', e.target.value)}
-                  />
+                  <Input placeholder="75 MB" value={version.size} onChange={(e) => updateVersion(index, 'size', e.target.value)} />
                 </div>
                 <div className="col-span-5 space-y-1">
                   <Label className="text-xs">Download Link</Label>
-                  <Input
-                    placeholder="https://..."
-                    value={version.link}
-                    onChange={(e) => updateVersion(index, 'link', e.target.value)}
-                  />
+                  <Input placeholder="https://..." value={version.link} onChange={(e) => updateVersion(index, 'link', e.target.value)} />
                 </div>
                 <div className="col-span-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeVersion(index)}
-                    disabled={versions.length === 1}
-                    className="text-destructive hover:text-destructive"
-                  >
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeVersion(index)} disabled={versions.length === 1} className="text-destructive hover:text-destructive">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             ))}
-            <p className="text-xs text-muted-foreground">Add multiple versions with different download links</p>
           </div>
 
+          {/* Premium */}
           <div className="flex items-center space-x-2 p-4 bg-primary/10 border border-primary/20 rounded-lg">
             <Checkbox
               id="isPremium"
@@ -603,62 +604,35 @@ export function AdminUpload() {
             </Label>
           </div>
 
+          {/* Upload Method */}
           <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as 'file' | 'url')}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="url">
-                <Link className="h-4 w-4 mr-2" />
-                URL
-              </TabsTrigger>
-              <TabsTrigger value="file">
-                <Upload className="h-4 w-4 mr-2" />
-                File
-              </TabsTrigger>
+              <TabsTrigger value="url"><Link className="h-4 w-4 mr-2" />URL</TabsTrigger>
+              <TabsTrigger value="file"><Upload className="h-4 w-4 mr-2" />File</TabsTrigger>
             </TabsList>
-
             <TabsContent value="url" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fileUrl">Download URL</Label>
-                <Input
-                  id="fileUrl"
-                  value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
-                  placeholder="https://..."
-                />
+                <Input id="fileUrl" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://..." />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="driveLink">Google Drive Link (Optional)</Label>
-                <Input
-                  id="driveLink"
-                  value={driveLink}
-                  onChange={(e) => setDriveLink(e.target.value)}
-                  placeholder="https://drive.google.com/..."
-                />
+                <Input id="driveLink" value={driveLink} onChange={(e) => setDriveLink(e.target.value)} placeholder="https://drive.google.com/..." />
               </div>
             </TabsContent>
-
             <TabsContent value="file" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="file">File</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                />
+                <Input id="file" type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
               </div>
             </TabsContent>
           </Tabs>
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Uploading...
-              </>
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading...</>
             ) : (
-              <>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload
-              </>
+              <><Upload className="h-4 w-4 mr-2" />Upload</>
             )}
           </Button>
         </form>

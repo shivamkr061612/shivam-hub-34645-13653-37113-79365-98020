@@ -108,6 +108,7 @@ export default function ItemDetails() {
   const canAccess = !isPremium || (user && isVerified);
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
   const isUpdated = item.updatedAt && (Date.now() - new Date(item.updatedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+  const isSimplifiedType = ['courses', 'bundles', 'assets'].includes(type || '');
 
   const handleDownloadClick = () => {
     if (!user) {
@@ -299,41 +300,14 @@ export default function ItemDetails() {
           </div>
         </motion.div>
 
-        {/* Info Grid */}
+        {/* Info Grid - simplified for courses/bundles/assets */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="grid grid-cols-2 gap-4 mt-6"
+          className={`grid ${isSimplifiedType ? 'grid-cols-2' : 'grid-cols-2'} gap-4 mt-6`}
         >
-          {/* App Name */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Package className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">App Name</p>
-            <p className="font-semibold text-foreground truncate">{item.appName || item.title?.split(' ')[0] || 'App'}</p>
-          </div>
-
-          {/* Version */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Code className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Version</p>
-            <p className="font-semibold text-foreground">{item.version || 'v1.0.0'}</p>
-          </div>
-
-          {/* Last Updated */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Calendar className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Last Updated</p>
-            <p className="font-semibold text-foreground">{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Recently'}</p>
-          </div>
-
-          {/* Publisher */}
+          {/* Publisher - always shown */}
           <div className="info-card">
             <div className="info-card-icon red">
               <Building2 className="h-5 w-5" />
@@ -342,59 +316,111 @@ export default function ItemDetails() {
             <p className="font-semibold text-foreground">{item.publisher || item.title?.split(' ')[0] || 'Publisher'}</p>
           </div>
 
-          {/* Requirements */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Puzzle className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Requirements</p>
-            <p className="font-semibold text-foreground">{item.requirements || 'Android 5.0+'}</p>
-          </div>
+          {isSimplifiedType ? (
+            <>
+              {/* Info section for simplified types */}
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Package className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">{item.infoLabel || (type === 'courses' ? 'Course Info' : type === 'bundles' ? 'Bundle Info' : 'Asset Info')}</p>
+                <p className="font-semibold text-foreground text-sm">{item.infoText || 'N/A'}</p>
+              </div>
 
-          {/* Category */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Package className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Category</p>
-            <p className="font-semibold text-primary">{item.category || 'App'}</p>
-          </div>
+              {/* Price */}
+              <div className="info-card">
+                <div className="info-card-icon green">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Price</p>
+                <p className="font-semibold text-accent">{item.price || 'Free'}</p>
+              </div>
 
-          {/* Size */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <HardDrive className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Size</p>
-            <p className="font-semibold text-foreground">{item.size || 'Varies'}</p>
-          </div>
+              {/* Safe */}
+              <div className="info-card">
+                <div className="info-card-icon green">
+                  <Shield className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Safe & Secure</p>
+                <p className="font-semibold text-foreground">100% Safe</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Full fields for mods/games */}
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Package className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">App Name</p>
+                <p className="font-semibold text-foreground truncate">{item.appName || item.title?.split(' ')[0] || 'App'}</p>
+              </div>
 
-          {/* Platform */}
-          <div className="info-card">
-            <div className="info-card-icon red">
-              <Link className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Platform</p>
-            <p className="font-semibold text-primary">{item.platform || 'Android'}</p>
-          </div>
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Code className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Version</p>
+                <p className="font-semibold text-foreground">{item.version || 'v1.0.0'}</p>
+              </div>
 
-          {/* Price */}
-          <div className="info-card">
-            <div className="info-card-icon green">
-              <DollarSign className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Price</p>
-            <p className="font-semibold text-accent">{item.price || 'Free'}</p>
-          </div>
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Last Updated</p>
+                <p className="font-semibold text-foreground">{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Recently'}</p>
+              </div>
 
-          {/* Safe & Secure */}
-          <div className="info-card">
-            <div className="info-card-icon green">
-              <Shield className="h-5 w-5" />
-            </div>
-            <p className="text-xs text-muted-foreground">Safe & Secure</p>
-            <p className="font-semibold text-foreground">100% Safe</p>
-          </div>
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Puzzle className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Requirements</p>
+                <p className="font-semibold text-foreground">{item.requirements || 'Android 5.0+'}</p>
+              </div>
+
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Package className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Category</p>
+                <p className="font-semibold text-primary">{item.category || 'App'}</p>
+              </div>
+
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <HardDrive className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Size</p>
+                <p className="font-semibold text-foreground">{item.size || 'Varies'}</p>
+              </div>
+
+              <div className="info-card">
+                <div className="info-card-icon red">
+                  <Link className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Platform</p>
+                <p className="font-semibold text-primary">{item.platform || 'Android'}</p>
+              </div>
+
+              <div className="info-card">
+                <div className="info-card-icon green">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Price</p>
+                <p className="font-semibold text-accent">{item.price || 'Free'}</p>
+              </div>
+
+              <div className="info-card">
+                <div className="info-card-icon green">
+                  <Shield className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted-foreground">Safe & Secure</p>
+                <p className="font-semibold text-foreground">100% Safe</p>
+              </div>
+            </>
+          )}
         </motion.div>
 
         {/* Screenshots Carousel */}
@@ -426,7 +452,8 @@ export default function ItemDetails() {
           </motion.div>
         )}
 
-        {/* MOD Info Collapsible */}
+        {/* MOD Info Collapsible - only for mods/games */}
+        {!isSimplifiedType && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -461,6 +488,7 @@ export default function ItemDetails() {
             </CollapsibleContent>
           </Collapsible>
         </motion.div>
+        )}
 
         {/* Action Buttons */}
         <motion.div
