@@ -58,11 +58,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Custom color utilities
-        "custom-red": "hsl(348 83% 55%)",
-        "custom-blue": "hsl(210 100% 50%)",
-        "custom-green": "hsl(145 65% 45%)",
-        "custom-orange": "hsl(35 95% 55%)",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          foreground: "hsl(var(--gold-foreground))",
+        },
+        purple: {
+          DEFAULT: "hsl(var(--purple))",
+          foreground: "hsl(var(--purple-foreground))",
+        },
+        orange: {
+          DEFAULT: "hsl(var(--orange))",
+          foreground: "hsl(var(--orange-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

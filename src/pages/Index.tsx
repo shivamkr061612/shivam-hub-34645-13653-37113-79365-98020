@@ -9,48 +9,25 @@ import { TechAICard } from '@/components/Home/TechAICard';
 
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { Zap, Star, Shield, Send } from 'lucide-react';
 
 const Index = () => {
   const { settings } = useWebsiteSettings();
   
   const sections = [
-    {
-      icon: sectionIcons.Mods,
-      title: 'Mods',
-      description: 'Discover and download the latest game modifications and enhancements',
-      path: '/mods',
-    },
-    {
-      icon: sectionIcons.Games,
-      title: 'Games',
-      description: 'Explore and download exciting games for all platforms',
-      path: '/games',
-    },
-    {
-      icon: sectionIcons.Assets,
-      title: 'Assets',
-      description: 'Download premium quality assets for your projects',
-      path: '/assets',
-    },
-    {
-      icon: sectionIcons.Bundles,
-      title: 'Bundles',
-      description: 'Get amazing bundle packs with exclusive content',
-      path: '/bundles',
-    },
-    {
-      icon: sectionIcons.Movies,
-      title: 'Movies',
-      description: 'Access a vast collection of movies across all genres',
-      path: 'https://tech-movies.vercel.app/',
-      external: true,
-    },
-    {
-      icon: sectionIcons.Courses,
-      title: 'Courses',
-      description: 'Learn new skills with our comprehensive course library',
-      path: '/courses',
-    },
+    { icon: sectionIcons.Mods, title: 'Mods', description: 'Discover and download the latest game modifications and enhancements', path: '/mods' },
+    { icon: sectionIcons.Games, title: 'Games', description: 'Explore and download exciting games for all platforms', path: '/games' },
+    { icon: sectionIcons.Assets, title: 'Assets', description: 'Download premium quality assets for your projects', path: '/assets' },
+    { icon: sectionIcons.Bundles, title: 'Bundles', description: 'Get amazing bundle packs with exclusive content', path: '/bundles' },
+    { icon: sectionIcons.Movies, title: 'Movies', description: 'Access a vast collection of movies across all genres', path: 'https://tech-movies.vercel.app/', external: true },
+    { icon: sectionIcons.Courses, title: 'Courses', description: 'Learn new skills with our comprehensive course library', path: '/courses' },
+  ];
+
+  const stats = [
+    { icon: Zap, label: 'Fast Downloads', value: '10K+', color: 'text-[hsl(355,90%,58%)]' },
+    { icon: Star, label: 'Premium Content', value: '500+', color: 'text-[hsl(42,95%,55%)]' },
+    { icon: Shield, label: 'Verified Safe', value: '100%', color: 'text-[hsl(160,70%,42%)]' },
+    { icon: Send, label: 'Daily Updates', value: '50+', color: 'text-[hsl(220,85%,52%)]' },
   ];
 
   return (
@@ -60,81 +37,134 @@ const Index = () => {
       <ChannelPopup />
       <HomePopup />
       
-      <main className="container px-4 pt-6 pb-12 space-y-8 relative z-10">
-        {/* Hero Section */}
+      <main className="container px-4 pt-6 pb-12 space-y-10 relative z-10">
+        {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center space-y-6 pt-4"
+          className="text-center space-y-3 pt-4"
         >
-          {/* Main Title */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-2"
+          >
+            <Zap className="h-3.5 w-3.5" />
+            Your Ultimate Digital Hub
+          </motion.div>
+          
           <motion.h1 
-            className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Welcome to the Future
+            <span className="text-foreground">Welcome to </span>
+            <span className="gradient-text">the Future</span>
           </motion.h1>
-          
-          {/* Promotional Banner Slider */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="w-full max-w-5xl mx-auto"
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto"
           >
-            <PromotionalBanner />
-          </motion.div>
+            Mods, Games, Assets, Courses & more — all in one place
+          </motion.p>
         </motion.div>
 
+        {/* Stats Row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto"
+        >
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 + i * 0.05 }}
+              className="glass-card rounded-xl p-4 text-center"
+            >
+              <stat.icon className={`h-5 w-5 mx-auto mb-1.5 ${stat.color}`} />
+              <p className="text-xl font-bold text-foreground">{stat.value}</p>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="w-full max-w-5xl mx-auto"
+        >
+          <PromotionalBanner />
+        </motion.div>
+
+        {/* Quote */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
         >
           <QuoteCarousel />
         </motion.div>
 
-        {/* Tech AI Card */}
+        {/* Tech AI */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
+          transition={{ delay: 0.4 }}
           className="max-w-5xl mx-auto"
         >
           <TechAICard />
         </motion.div>
 
-        {/* Cards Grid */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto"
-        >
-          {sections.map((section, index) => (
-            <SectionCard
-              key={section.title}
-              icon={section.icon}
-              title={section.title}
-              description={section.description}
-              path={section.path}
-              external={section.external}
-              index={index}
-            />
-          ))}
-        </motion.div>
+        {/* Section Cards */}
+        <div>
+          <motion.h2
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45 }}
+            className="text-2xl md:text-3xl font-bold text-center mb-6"
+          >
+            <span className="text-foreground">Browse </span>
+            <span className="gradient-text-blue">Categories</span>
+          </motion.h2>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto"
+          >
+            {sections.map((section, index) => (
+              <SectionCard
+                key={section.title}
+                icon={section.icon}
+                title={section.title}
+                description={section.description}
+                path={section.path}
+                external={section.external}
+                index={index}
+              />
+            ))}
+          </motion.div>
+        </div>
 
-        {/* Site Description */}
+        {/* About */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           className="max-w-2xl mx-auto"
         >
-          <div className="glass-card rounded-xl p-6 text-center">
+          <div className="glass-card rounded-2xl p-6 text-center">
             <p className="text-base text-muted-foreground leading-relaxed">
               {settings.siteDescription}
             </p>
@@ -146,31 +176,27 @@ const Index = () => {
         <div className="container px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="text-base font-semibold mb-3 text-foreground">About Us</h3>
-              <p className="text-sm text-muted-foreground">
-                {settings.aboutUs}
-              </p>
+              <h3 className="text-base font-semibold mb-3 gradient-text">About Us</h3>
+              <p className="text-sm text-muted-foreground">{settings.aboutUs}</p>
             </div>
-            
             <div>
-              <h3 className="text-base font-semibold mb-3 text-foreground">What We Offer</h3>
+              <h3 className="text-base font-semibold mb-3 gradient-text-blue">What We Offer</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {settings.whatWeOffer.split('|').map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/40"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            
             <div>
-              <h3 className="text-base font-semibold mb-3 text-foreground">Connect With Us</h3>
+              <h3 className="text-base font-semibold mb-3 gradient-text-green">Connect With Us</h3>
               <a 
                 href={settings.channelLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-foreground hover:text-muted-foreground transition-colors px-4 py-2 rounded-lg border border-border hover:bg-secondary"
+                className="inline-flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors px-4 py-2 rounded-lg border border-border hover:border-primary/30"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -179,10 +205,9 @@ const Index = () => {
               </a>
             </div>
           </div>
-          
           <div className="border-t border-border pt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Developer: <span className="font-semibold text-foreground">SHIVAM KUMAR</span>
+              Developer: <span className="font-semibold gradient-text">SHIVAM KUMAR</span>
             </p>
           </div>
         </div>
