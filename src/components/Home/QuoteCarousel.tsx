@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '@/components/ui/card';
+import { Quote } from 'lucide-react';
 
 const quotes = [
   "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -24,35 +24,43 @@ export function QuoteCarousel() {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % quotes.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <Card className="relative overflow-hidden p-8 bg-gradient-to-r from-primary/10 to-primary/5">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <p className="text-lg md:text-xl font-medium italic">"{quotes[currentIndex]}"</p>
-        </motion.div>
-      </AnimatePresence>
-      <div className="flex justify-center gap-2 mt-6">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 md:p-8">
+      {/* Decorative accent */}
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary via-secondary to-accent rounded-l-2xl" />
+      
+      <div className="flex items-start gap-3 pl-4">
+        <Quote className="h-6 w-6 text-primary/40 flex-shrink-0 mt-1" />
+        <div className="flex-1 min-h-[3.5rem]">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentIndex}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.4 }}
+              className="text-base md:text-lg font-medium text-foreground/90 italic"
+            >
+              {quotes[currentIndex]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+      
+      <div className="flex justify-center gap-1.5 mt-5 pl-4">
         {quotes.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentIndex ? 'w-8 bg-primary' : 'w-2 bg-primary/30'
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              index === currentIndex ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40'
             }`}
           />
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
