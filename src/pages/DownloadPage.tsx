@@ -15,6 +15,7 @@ import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { KeyGenerationDialog } from '@/components/Content/KeyGenerationDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { AdSlot } from '@/components/Ads/AdSlot';
 import {
   Accordion,
   AccordionContent,
@@ -22,6 +23,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Progress } from '@/components/ui/progress';
+
+function TelegramButton() {
+  const { settings } = useWebsiteSettings();
+  return (
+    <Button
+      onClick={() => window.open(settings.telegramLink || 'https://t.me/techshivam', '_blank')}
+      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-5 rounded-xl"
+    >
+      <Send className="h-5 w-5 mr-2" />
+      Join Our Telegram channel
+    </Button>
+  );
+}
 
 interface Version {
   name: string;
@@ -212,6 +226,9 @@ export default function DownloadPage() {
           <p>The following are available links. Just press the button and the file will be automatically downloaded.</p>
         </motion.div>
 
+        {/* Ad slot */}
+        <AdSlot position="download_page" className="mb-4" />
+
         {/* Ad placeholder */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -280,13 +297,7 @@ export default function DownloadPage() {
           transition={{ delay: 0.2 }}
           className="mt-8"
         >
-          <Button
-            onClick={() => window.open('https://t.me/techshivam', '_blank')}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-5 rounded-xl"
-          >
-            <Send className="h-5 w-5 mr-2" />
-            Join Our Telegram channel
-          </Button>
+          <TelegramButton />
         </motion.div>
 
         {/* Important Notes */}
