@@ -29,6 +29,9 @@ import AdminKeyGeneration from '@/components/Admin/AdminKeyGeneration';
 import { AdminPromotionalBanners } from '@/components/Admin/AdminPromotionalBanners';
 import { AdminUserUploads } from '@/components/Admin/AdminUserUploads';
 import { AdminPromotionSettings } from '@/components/Admin/AdminPromotionSettings';
+import { AdminAds } from '@/components/Admin/AdminAds';
+import { AdminTrending } from '@/components/Admin/AdminTrending';
+import { AdminCacheControl } from '@/components/Admin/AdminCacheControl';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {
@@ -80,6 +83,9 @@ const Admin = () => {
             <TabsTrigger value="promotional-banners" className="whitespace-nowrap text-sm">Promo Banners</TabsTrigger>
             <TabsTrigger value="user-uploads" className="whitespace-nowrap text-sm">User Uploads</TabsTrigger>
             <TabsTrigger value="promotion-settings" className="whitespace-nowrap text-sm">Promotions</TabsTrigger>
+            <TabsTrigger value="trending" className="whitespace-nowrap text-sm">Trending</TabsTrigger>
+            <TabsTrigger value="ads" className="whitespace-nowrap text-sm">Ads</TabsTrigger>
+            <TabsTrigger value="cache" className="whitespace-nowrap text-sm">Cache</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload">
@@ -188,6 +194,18 @@ const Admin = () => {
 
           <TabsContent value="promotion-settings">
             <AdminPromotionSettings />
+          </TabsContent>
+
+          <TabsContent value="trending">
+            <AdminTrending />
+          </TabsContent>
+
+          <TabsContent value="ads">
+            <AdminAds />
+          </TabsContent>
+
+          <TabsContent value="cache">
+            <AdminCacheControl />
           </TabsContent>
         </Tabs>
 
