@@ -230,7 +230,7 @@ const BlueTickPurchase = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container px-4 py-12">
+      <div className="container px-3 sm:px-4 py-8 sm:py-12">
         <div className="max-w-2xl mx-auto">
           {/* Special Offers Section - Show at top */}
           {specialOffers.length > 0 && (

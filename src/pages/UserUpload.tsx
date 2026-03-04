@@ -115,7 +115,7 @@ export default function UserUpload() {
     <PageTransition>
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="container px-4 py-8 max-w-2xl mx-auto">
+        <main className="container px-3 sm:px-4 py-6 sm:py-8 max-w-2xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-center gap-3 mb-6">
               <Upload className="h-7 w-7 text-primary" />

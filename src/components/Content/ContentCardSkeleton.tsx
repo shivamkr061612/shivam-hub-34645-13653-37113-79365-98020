@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ContentCardSkeletonProps {
@@ -6,45 +5,31 @@ interface ContentCardSkeletonProps {
 }
 
 export function ContentCardSkeleton({ viewMode = 'grid' }: ContentCardSkeletonProps) {
+  if (viewMode === 'list') {
+    return (
+      <div className="flex items-start gap-3 p-3 bg-card rounded-2xl border border-border/60">
+        <Skeleton className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-xl flex-shrink-0" />
+        <div className="flex-1 space-y-2 py-1">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-3 w-full" />
+          <div className="flex justify-between">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-6 w-14 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Card className={`overflow-hidden border-2 ${viewMode === 'list' ? 'flex flex-row' : ''}`}>
-      {/* Image skeleton */}
-      <div className={`relative ${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'w-full'}`}>
-        <Skeleton className={`w-full ${viewMode === 'list' ? 'h-full' : 'h-64'} rounded-t-lg`} />
-        
-        {/* Badge skeleton */}
-        <div className="absolute top-2 left-2 flex gap-2">
-          <Skeleton className="h-5 w-20 rounded-full" />
-        </div>
-        
-        {/* Action buttons skeleton */}
-        <div className="absolute top-2 right-2 flex gap-1">
-          <Skeleton className="h-8 w-8 rounded-md" />
-          <Skeleton className="h-8 w-8 rounded-md" />
-        </div>
+    <div className="bg-card rounded-2xl border border-border/60 overflow-hidden">
+      <Skeleton className="w-full aspect-square" />
+      <div className="p-2.5 space-y-1.5">
+        <Skeleton className="h-3.5 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
       </div>
-      
-      <div className="flex-1">
-        <CardHeader className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-10" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-3">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-28" />
-          </div>
-          <Skeleton className="h-10 w-full rounded-md" />
-        </CardContent>
-      </div>
-    </Card>
+    </div>
   );
 }
 

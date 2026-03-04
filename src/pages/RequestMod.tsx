@@ -50,7 +50,7 @@ const RequestMod = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container px-4 py-8 max-w-2xl">
+      <div className="container px-3 sm:px-4 py-6 sm:py-8 max-w-2xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>Request a Mod</CardTitle>
