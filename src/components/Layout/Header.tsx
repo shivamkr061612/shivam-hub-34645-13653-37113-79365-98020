@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, User, Sun, Moon } from 'lucide-react';
+import { Menu, User, Sun, Moon, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { ProfileDrawer } from '@/components/Profile/ProfileDrawer';
@@ -20,6 +20,13 @@ export function Header() {
     const saved = localStorage.getItem('theme');
     return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (isDark) {
@@ -43,43 +50,60 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled 
+          ? 'bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-sm' 
+          : 'bg-background/70 backdrop-blur-md'
+      }`}>
+        <div className="container flex h-14 items-center justify-between px-3 sm:px-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setShowNav(true)}
+              className="h-9 w-9 rounded-xl hover:bg-primary/10"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-3">
-              <img 
-                src={settings.logoUrl} 
-                alt={`${settings.siteName} Logo`} 
-                className="h-10 w-10 rounded-full object-cover"
-              />
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl overflow-hidden ring-1 ring-primary/20">
+                <img 
+                  src={settings.logoUrl} 
+                  alt={`${settings.siteName} Logo`} 
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <h1 className="text-base sm:text-lg font-extrabold gradient-text flex items-center gap-1.5 leading-none">
                 {settings.siteName}
                 {user && isVerified && <KingBadge size="lg" />}
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleTheme}
+              className="h-9 w-9 rounded-xl hover:bg-muted"
+            >
+              {isDark ? <Sun className="h-4 w-4 text-[hsl(42,95%,55%)]" /> : <Moon className="h-4 w-4" />}
             </Button>
             {user ? (
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => setShowProfile(true)}
+                className="h-9 w-9 rounded-xl hover:bg-primary/10"
               >
-                <User className="h-5 w-5" />
+                <User className="h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={() => setShowAuthDialog(true)}>
+              <Button 
+                onClick={() => setShowAuthDialog(true)} 
+                size="sm"
+                className="h-8 px-4 rounded-xl text-xs font-bold bg-primary hover:bg-primary/90"
+              >
                 Login
               </Button>
             )}
