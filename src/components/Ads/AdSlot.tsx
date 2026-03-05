@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useVerification } from '@/hooks/useVerification';
 
 interface AdSlotProps {
   position: string;
@@ -10,6 +11,7 @@ interface AdSlotProps {
 export function AdSlot({ position, className = '' }: AdSlotProps) {
   const [adScript, setAdScript] = useState<string>('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isVerified } = useVerification();
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -18,7 +20,6 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const ads = docSnap.data();
-          // Check for position-specific ad or global ad
           const script = ads[position] || ads['global'] || '';
           setAdScript(script);
         }
@@ -32,7 +33,6 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
   useEffect(() => {
     if (adScript && containerRef.current) {
       containerRef.current.innerHTML = adScript;
-      // Execute scripts
       const scripts = containerRef.current.querySelectorAll('script');
       scripts.forEach(script => {
         const newScript = document.createElement('script');
@@ -43,6 +43,8 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
     }
   }, [adScript]);
 
+  // Hide ads for King Badge holders
+  if (isVerified) return null;
   if (!adScript) return null;
 
   return (

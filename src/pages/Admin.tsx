@@ -32,6 +32,7 @@ import { AdminPromotionSettings } from '@/components/Admin/AdminPromotionSetting
 import { AdminAds } from '@/components/Admin/AdminAds';
 import { AdminTrending } from '@/components/Admin/AdminTrending';
 import { AdminCacheControl } from '@/components/Admin/AdminCacheControl';
+import { AdminSEO } from '@/components/Admin/AdminSEO';
 import { Shield } from 'lucide-react';
 
 const Admin = () => {
@@ -85,6 +86,7 @@ const Admin = () => {
             <TabsTrigger value="promotion-settings" className="whitespace-nowrap text-sm">Promotions</TabsTrigger>
             <TabsTrigger value="trending" className="whitespace-nowrap text-sm">Trending</TabsTrigger>
             <TabsTrigger value="ads" className="whitespace-nowrap text-sm">Ads</TabsTrigger>
+            <TabsTrigger value="seo" className="whitespace-nowrap text-sm">SEO</TabsTrigger>
             <TabsTrigger value="cache" className="whitespace-nowrap text-sm">Cache</TabsTrigger>
           </TabsList>
 
@@ -202,6 +204,10 @@ const Admin = () => {
 
           <TabsContent value="ads">
             <AdminAds />
+          </TabsContent>
+
+          <TabsContent value="seo">
+            <AdminSEO />
           </TabsContent>
 
           <TabsContent value="cache">

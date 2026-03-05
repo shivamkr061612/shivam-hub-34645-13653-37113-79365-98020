@@ -2,11 +2,29 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Snowflake, Palette, Flame, Sparkles } from 'lucide-react';
+import { Snowflake, Palette } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const themeOptions = [
+  { value: 'default', label: 'Default', color: 'from-red-500 to-red-600', desc: 'Clean red & white' },
+  { value: 'cyber-pink', label: 'Cyber Pink', color: 'from-blue-500 via-pink-500 to-purple-500', desc: 'Black, Blue, Pink' },
+  { value: 'spring', label: 'Spring', color: 'from-green-400 to-emerald-500', desc: 'Fresh greens & florals' },
+  { value: 'summer', label: 'Summer', color: 'from-yellow-400 to-orange-500', desc: 'Warm sunshine vibes' },
+  { value: 'autumn', label: 'Autumn', color: 'from-orange-500 to-amber-700', desc: 'Warm fall colors' },
+  { value: 'winter', label: 'Winter', color: 'from-blue-300 to-cyan-500', desc: 'Cool icy blues' },
+  { value: 'diwali', label: 'Diwali', color: 'from-yellow-500 via-orange-500 to-red-600', desc: 'Festival of lights' },
+  { value: 'holi', label: 'Holi', color: 'from-pink-500 via-purple-500 to-blue-500', desc: 'Festival of colors' },
+  { value: 'christmas', label: 'Christmas', color: 'from-red-600 to-green-600', desc: 'Holiday spirit' },
+  { value: 'newyear', label: 'New Year', color: 'from-yellow-400 via-gold to-amber-500', desc: 'Golden celebration' },
+  { value: 'valentine', label: 'Valentine', color: 'from-pink-400 to-rose-600', desc: 'Love & romance' },
+  { value: 'independence', label: 'Independence Day', color: 'from-orange-500 via-white to-green-600', desc: 'Tiranga theme' },
+  { value: 'ocean', label: 'Ocean', color: 'from-blue-400 to-teal-600', desc: 'Deep sea blues' },
+  { value: 'sunset', label: 'Sunset', color: 'from-orange-400 via-rose-500 to-purple-600', desc: 'Evening sky' },
+  { value: 'midnight', label: 'Midnight', color: 'from-indigo-800 to-purple-900', desc: 'Dark & mysterious' },
+];
 
 export function AdminTheme() {
   const [winterThemeEnabled, setWinterThemeEnabled] = useState(false);
@@ -18,7 +36,6 @@ export function AdminTheme() {
       try {
         const docRef = doc(db, 'settings', 'theme');
         const docSnap = await getDoc(docRef);
-        
         if (docSnap.exists()) {
           setWinterThemeEnabled(docSnap.data()?.winterThemeEnabled || false);
           setColorTheme(docSnap.data()?.colorTheme || 'default');
@@ -29,19 +46,16 @@ export function AdminTheme() {
         setLoading(false);
       }
     };
-
     fetchSettings();
   }, []);
 
   const handleToggleWinterTheme = async (checked: boolean) => {
     try {
       setWinterThemeEnabled(checked);
-      const docRef = doc(db, 'settings', 'theme');
-      await setDoc(docRef, { winterThemeEnabled: checked }, { merge: true });
-      toast.success(checked ? '❄️ Winter theme enabled!' : '🌸 Winter theme disabled!');
+      await setDoc(doc(db, 'settings', 'theme'), { winterThemeEnabled: checked }, { merge: true });
+      toast.success(checked ? 'Winter effects enabled!' : 'Winter effects disabled!');
     } catch (error) {
-      console.error('Error updating winter theme:', error);
-      toast.error('Failed to update theme settings');
+      toast.error('Failed to update theme');
       setWinterThemeEnabled(!checked);
     }
   };
@@ -49,23 +63,15 @@ export function AdminTheme() {
   const handleColorThemeChange = async (theme: string) => {
     try {
       setColorTheme(theme);
-      const docRef = doc(db, 'settings', 'theme');
-      await setDoc(docRef, { colorTheme: theme }, { merge: true });
-      const themeNames: Record<string, string> = {
-        'default': 'Default (Red & White)',
-        'cyber-pink': 'Cyber Pink',
-        'cartoon': 'Cartoon Fun'
-      };
-      toast.success(`🎨 ${themeNames[theme]} theme activated!`);
+      await setDoc(doc(db, 'settings', 'theme'), { colorTheme: theme }, { merge: true });
+      const found = themeOptions.find(t => t.value === theme);
+      toast.success(`${found?.label || theme} theme activated!`);
     } catch (error) {
-      console.error('Error updating color theme:', error);
-      toast.error('Failed to update theme settings');
+      toast.error('Failed to update theme');
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
 
   return (
     <Card>
@@ -79,71 +85,55 @@ export function AdminTheme() {
         <div className="space-y-3">
           <Label className="flex flex-col space-y-1">
             <span className="text-base font-semibold">Color Theme</span>
-            <span className="text-sm text-muted-foreground">
-              Choose the color scheme for the website
-            </span>
+            <span className="text-sm text-muted-foreground">Choose seasonal, festival or custom theme</span>
           </Label>
           <Select value={colorTheme} onValueChange={handleColorThemeChange}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="default">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 to-red-600" />
-                  Default (Red & White)
-                </div>
-              </SelectItem>
-              <SelectItem value="cyber-pink">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500" />
-                  Cyber Pink (Black, Blue, Pink, White)
-                </div>
-              </SelectItem>
-              <SelectItem value="cartoon">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500" />
-                  Cartoon Fun (Fire & Winter Effects)
-                </div>
-              </SelectItem>
+              {themeOptions.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${opt.color}`} />
+                    <span>{opt.label}</span>
+                    <span className="text-muted-foreground text-xs">- {opt.desc}</span>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Theme Preview Grid */}
+        <div>
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Quick Select</p>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            {themeOptions.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => handleColorThemeChange(opt.value)}
+                className={`p-2 rounded-xl border transition-all text-center ${
+                  colorTheme === opt.value ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/30'
+                }`}
+              >
+                <div className={`w-full h-6 rounded-lg bg-gradient-to-r ${opt.color} mb-1`} />
+                <span className="text-[10px] font-medium text-foreground">{opt.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center justify-between space-x-2">
           <Label htmlFor="winter-theme" className="flex flex-col space-y-1">
             <span className="text-base font-semibold flex items-center gap-2">
               <Snowflake className="h-4 w-4" />
-              Winter Theme
+              Snow Effect
             </span>
-            <span className="text-sm text-muted-foreground">
-              Enable falling snow effect across the website
-            </span>
+            <span className="text-sm text-muted-foreground">Enable falling snow overlay</span>
           </Label>
-          <Switch
-            id="winter-theme"
-            checked={winterThemeEnabled}
-            onCheckedChange={handleToggleWinterTheme}
-          />
+          <Switch id="winter-theme" checked={winterThemeEnabled} onCheckedChange={handleToggleWinterTheme} />
         </div>
-
-        {winterThemeEnabled && (
-          <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-            <p className="text-sm text-muted-foreground">
-              ❄️ Winter theme is now active! Users will see falling snow across the website.
-            </p>
-          </div>
-        )}
-
-        {colorTheme === 'cartoon' && (
-          <div className="p-4 bg-gradient-to-r from-orange-500/10 via-yellow-500/10 to-cyan-500/10 rounded-lg border border-orange-500/20">
-            <p className="text-sm text-muted-foreground flex items-center gap-2">
-              <Flame className="h-4 w-4 text-orange-500" />
-              <Sparkles className="h-4 w-4 text-cyan-500" />
-              Cartoon theme with fire & winter effects is active!
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

@@ -7,21 +7,22 @@ import { HomePopup } from '@/components/Home/HomePopup';
 import { TechAICard } from '@/components/Home/TechAICard';
 import { QuoteCarousel } from '@/components/Home/QuoteCarousel';
 import { AdSlot } from '@/components/Ads/AdSlot';
+import { KingBadgePrompt } from '@/components/Ads/KingBadgePrompt';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
-import { Send, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 const Index = () => {
   const { settings } = useWebsiteSettings();
 
   const sections = [
-    { icon: sectionIcons.Mods, title: 'Mods', description: 'Premium mods', path: '/mods', emoji: '⚡' },
-    { icon: sectionIcons.Games, title: 'Games', description: 'Top games', path: '/games', emoji: '🎮' },
-    { icon: sectionIcons.Assets, title: 'Assets', description: 'Quality assets', path: '/assets', emoji: '🎨' },
-    { icon: sectionIcons.Bundles, title: 'Bundles', description: 'Bundle packs', path: '/bundles', emoji: '📦' },
-    { icon: sectionIcons.Movies, title: 'Movies', description: 'All genres', path: 'https://tech-movies.vercel.app/', external: true, emoji: '🎬' },
-    { icon: sectionIcons.Courses, title: 'Courses', description: 'Learn skills', path: '/courses', emoji: '📚' },
+    { icon: sectionIcons.Mods, title: 'Mods', description: 'Premium mods', path: '/mods' },
+    { icon: sectionIcons.Games, title: 'Games', description: 'Top games', path: '/games' },
+    { icon: sectionIcons.Assets, title: 'Assets', description: 'Quality assets', path: '/assets' },
+    { icon: sectionIcons.Bundles, title: 'Bundles', description: 'Bundle packs', path: '/bundles' },
+    { icon: sectionIcons.Movies, title: 'Movies', description: 'All genres', path: 'https://tech-movies.vercel.app/', external: true },
+    { icon: sectionIcons.Courses, title: 'Courses', description: 'Learn skills', path: '/courses' },
   ];
 
   return (
@@ -30,6 +31,7 @@ const Index = () => {
         <Header />
         <ChannelPopup />
         <HomePopup />
+        <KingBadgePrompt />
 
         <main className="container px-3 sm:px-4 pt-3 pb-10 space-y-6 relative z-10 max-w-4xl mx-auto">
           {/* Banner */}
@@ -58,6 +60,8 @@ const Index = () => {
               ))}
             </div>
           </div>
+
+          <AdSlot position="home_after_categories" />
 
           {/* Tech AI */}
           <TechAICard />

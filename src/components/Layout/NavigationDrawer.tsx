@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Upload, Megaphone, ChevronRight, Zap, Star } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Upload, Megaphone, ChevronRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +8,7 @@ import { ChannelDialog } from '@/components/Channels/ChannelDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useTheme } from 'next-themes';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface NavigationDrawerProps {
   open: boolean;
@@ -17,12 +16,12 @@ interface NavigationDrawerProps {
 }
 
 const mainGridItems = [
-  { icon: Home, label: 'Home', path: '/', color: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]', emoji: '🏠' },
-  { icon: Gamepad2, label: 'Games', path: '/games', color: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]', emoji: '🎮' },
-  { icon: Package, label: 'Mods', path: '/mods', color: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,50%)]', emoji: '⚡' },
-  { icon: Layers, label: 'Assets', path: '/assets', color: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]', emoji: '🎨' },
-  { icon: FolderArchive, label: 'Bundles', path: '/bundles', color: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]', emoji: '📦' },
-  { icon: GraduationCap, label: 'Courses', path: '/courses', color: 'from-[hsl(25,95%,55%)] to-[hsl(15,90%,50%)]', emoji: '📚' },
+  { icon: Home, label: 'Home', path: '/', color: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]' },
+  { icon: Gamepad2, label: 'Games', path: '/games', color: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]' },
+  { icon: Package, label: 'Mods', path: '/mods', color: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,50%)]' },
+  { icon: Layers, label: 'Assets', path: '/assets', color: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]' },
+  { icon: FolderArchive, label: 'Bundles', path: '/bundles', color: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]' },
+  { icon: GraduationCap, label: 'Courses', path: '/courses', color: 'from-[hsl(25,95%,55%)] to-[hsl(15,90%,50%)]' },
 ];
 
 export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) {
@@ -64,9 +63,9 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-[300px] sm:w-[340px] p-0 overflow-hidden border-r border-border/50 bg-background">
-          {/* Header with gradient */}
-          <div className="relative px-5 pt-5 pb-4">
+        <SheetContent side="left" className="w-[300px] sm:w-[340px] p-0 overflow-hidden border-r border-border/50 bg-background flex flex-col">
+          {/* Header */}
+          <div className="relative px-5 pt-5 pb-4 flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-secondary/5 to-transparent" />
             <SheetHeader className="relative">
               <SheetTitle className="text-left flex items-center gap-3">
@@ -81,7 +80,7 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
             </SheetHeader>
           </div>
 
-          <ScrollArea className="h-[calc(100vh-90px)]">
+          <ScrollArea className="flex-1 min-h-0">
             <div className="px-4 pb-6 space-y-5">
               {/* Category Grid */}
               <div>
@@ -96,7 +95,7 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                       className={`relative bg-gradient-to-br ${item.color} rounded-2xl p-3 flex flex-col items-center justify-center gap-1.5 text-white shadow-md hover:shadow-xl hover:scale-[1.04] active:scale-95 transition-all duration-200`}
                       onClick={() => handleNavigation(item.path)}
                     >
-                      <span className="text-xl">{item.emoji}</span>
+                      <item.icon className="h-5 w-5" />
                       <span className="text-[11px] font-bold tracking-wide">{item.label}</span>
                     </motion.button>
                   ))}
@@ -159,8 +158,8 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                       <Crown className="h-5 w-5" />
                     </div>
                     <div className="text-left">
-                      <p className="font-bold text-sm">Get King Badge 👑</p>
-                      <p className="text-[10px] opacity-80">Premium benefits & blue tick</p>
+                      <p className="font-bold text-sm">Get King Badge</p>
+                      <p className="text-[10px] opacity-80">Premium benefits & ad-free</p>
                     </div>
                     <ChevronRight className="h-5 w-5 ml-auto opacity-70" />
                   </div>

@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ContentCard } from './ContentCard';
 import { ContentCardSkeletonGrid } from './ContentCardSkeleton';
-import { Search, Grid, List, SlidersHorizontal, Package, Gamepad2, GraduationCap, Layers, FolderArchive, Film } from 'lucide-react';
+import { Search, Grid, List, Package, Gamepad2, GraduationCap, Layers, FolderArchive, Film } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
 import { AdSlot } from '@/components/Ads/AdSlot';
@@ -15,13 +15,13 @@ interface ContentListProps {
   type: 'mods' | 'movies' | 'courses' | 'games' | 'assets' | 'bundles';
 }
 
-const typeConfig: Record<string, { gradient: string; icon: any; emoji: string }> = {
-  mods: { gradient: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,50%)]', icon: Package, emoji: '⚡' },
-  games: { gradient: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]', icon: Gamepad2, emoji: '🎮' },
-  courses: { gradient: 'from-[hsl(25,95%,55%)] to-[hsl(15,90%,50%)]', icon: GraduationCap, emoji: '📚' },
-  assets: { gradient: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]', icon: Layers, emoji: '🎨' },
-  bundles: { gradient: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]', icon: FolderArchive, emoji: '📦' },
-  movies: { gradient: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]', icon: Film, emoji: '🎬' },
+const typeConfig: Record<string, { gradient: string; icon: any }> = {
+  mods: { gradient: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,50%)]', icon: Package },
+  games: { gradient: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]', icon: Gamepad2 },
+  courses: { gradient: 'from-[hsl(25,95%,55%)] to-[hsl(15,90%,50%)]', icon: GraduationCap },
+  assets: { gradient: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]', icon: Layers },
+  bundles: { gradient: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]', icon: FolderArchive },
+  movies: { gradient: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]', icon: Film },
 };
 
 export function ContentList({ title, items, loading, type }: ContentListProps) {
@@ -30,6 +30,7 @@ export function ContentList({ title, items, loading, type }: ContentListProps) {
   const [sortBy, setSortBy] = useState('newest');
 
   const config = typeConfig[type] || typeConfig.mods;
+  const Icon = config.icon;
 
   const filteredItems = items
     .filter(item => 
@@ -53,7 +54,7 @@ export function ContentList({ title, items, loading, type }: ContentListProps) {
       >
         <div className="flex items-center gap-3 mb-1">
           <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white shadow-md`}>
-            <span className="text-lg">{config.emoji}</span>
+            <Icon className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-foreground">{title}</h1>
