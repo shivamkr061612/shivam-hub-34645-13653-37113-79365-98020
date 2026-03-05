@@ -16,43 +16,48 @@ interface SectionCardProps {
   external?: boolean;
 }
 
-// Each section gets its own color identity
-const sectionColors: Record<string, { gradient: string; iconBg: string; shadow: string; border: string }> = {
+const sectionColors: Record<string, { gradient: string; iconBg: string; shadow: string; border: string; btnGradient: string }> = {
   Mods: {
     gradient: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]',
-    iconBg: 'bg-[hsl(355,90%,58%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(355,90%,58%,0.2)]',
-    border: 'hover:border-[hsl(355,90%,58%,0.4)]',
+    iconBg: 'bg-[hsl(355,90%,58%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(355,90%,58%,0.15)]',
+    border: 'hover:border-[hsl(355,90%,58%,0.3)]',
+    btnGradient: 'from-[hsl(355,90%,58%)] to-[hsl(330,85%,55%)]',
   },
   Games: {
     gradient: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]',
-    iconBg: 'bg-[hsl(220,85%,52%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(220,85%,52%,0.2)]',
-    border: 'hover:border-[hsl(220,85%,52%,0.4)]',
+    iconBg: 'bg-[hsl(220,85%,52%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(220,85%,52%,0.15)]',
+    border: 'hover:border-[hsl(220,85%,52%,0.3)]',
+    btnGradient: 'from-[hsl(220,85%,52%)] to-[hsl(250,80%,58%)]',
   },
   Assets: {
     gradient: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]',
-    iconBg: 'bg-[hsl(160,70%,42%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(160,70%,42%,0.2)]',
-    border: 'hover:border-[hsl(160,70%,42%,0.4)]',
+    iconBg: 'bg-[hsl(160,70%,42%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(160,70%,42%,0.15)]',
+    border: 'hover:border-[hsl(160,70%,42%,0.3)]',
+    btnGradient: 'from-[hsl(160,70%,42%)] to-[hsl(180,65%,40%)]',
   },
   Bundles: {
     gradient: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,55%)]',
-    iconBg: 'bg-[hsl(270,75%,58%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(270,75%,58%,0.2)]',
-    border: 'hover:border-[hsl(270,75%,58%,0.4)]',
+    iconBg: 'bg-[hsl(270,75%,58%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(270,75%,58%,0.15)]',
+    border: 'hover:border-[hsl(270,75%,58%,0.3)]',
+    btnGradient: 'from-[hsl(270,75%,58%)] to-[hsl(290,70%,55%)]',
   },
   Movies: {
     gradient: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]',
-    iconBg: 'bg-[hsl(42,95%,55%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(42,95%,55%,0.2)]',
-    border: 'hover:border-[hsl(42,95%,55%,0.4)]',
+    iconBg: 'bg-[hsl(42,95%,55%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(42,95%,55%,0.15)]',
+    border: 'hover:border-[hsl(42,95%,55%,0.3)]',
+    btnGradient: 'from-[hsl(42,95%,55%)] to-[hsl(25,95%,55%)]',
   },
   Courses: {
-    gradient: 'from-[hsl(355,90%,58%)] to-[hsl(42,95%,55%)]',
-    iconBg: 'bg-[hsl(25,95%,55%,0.12)]',
-    shadow: 'hover:shadow-[0_8px_30px_hsl(25,95%,55%,0.2)]',
-    border: 'hover:border-[hsl(25,95%,55%,0.4)]',
+    gradient: 'from-[hsl(25,95%,55%)] to-[hsl(355,90%,58%)]',
+    iconBg: 'bg-[hsl(25,95%,55%,0.1)]',
+    shadow: 'hover:shadow-[0_4px_20px_hsl(25,95%,55%,0.15)]',
+    border: 'hover:border-[hsl(25,95%,55%,0.3)]',
+    btnGradient: 'from-[hsl(25,95%,55%)] to-[hsl(355,90%,58%)]',
   },
 };
 
@@ -77,43 +82,40 @@ export function SectionCard({ icon: Icon, title, description, path, index, exter
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          delay: index * 0.08,
-          type: "spring",
-          stiffness: 120
-        }}
-        whileHover={{ y: -6 }}
+        transition={{ delay: index * 0.06, type: "spring", stiffness: 150 }}
+        whileHover={{ y: -4 }}
         className="h-full"
       >
         <Card className={`h-full group relative overflow-hidden border border-border bg-card transition-all duration-300 ${colors.shadow} ${colors.border}`}>
           {/* Colored top accent bar */}
           <div className={`h-1 w-full bg-gradient-to-r ${colors.gradient}`} />
           
-          <CardHeader className="relative z-10 pb-3 pt-5">
+          <CardHeader className="relative z-10 pb-2 pt-4 px-3">
             <motion.div 
-              className={`${colors.iconBg} h-14 w-14 rounded-2xl flex items-center justify-center mb-4`}
-              whileHover={{ scale: 1.1, rotate: 5 }}
+              className={`${colors.iconBg} h-12 w-12 rounded-2xl flex items-center justify-center mb-3`}
+              whileHover={{ scale: 1.08, rotate: 3 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <Icon className={`h-7 w-7 bg-gradient-to-br ${colors.gradient} bg-clip-text`} style={{ color: 'inherit' }} strokeWidth={1.8} />
+              <Icon className="h-6 w-6" style={{ color: 'hsl(var(--foreground))' }} strokeWidth={1.8} />
             </motion.div>
             
-            <CardTitle className="text-lg font-bold text-foreground">{title}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+            <CardTitle className="text-base font-bold text-foreground">{title}</CardTitle>
+            <CardDescription className="text-xs text-muted-foreground leading-relaxed">
               {description}
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="relative z-10 pt-1 pb-5">
+          <CardContent className="relative z-10 pt-1 pb-4 px-3">
             <Button 
               onClick={handleGetStarted} 
-              className={`w-full bg-gradient-to-r ${colors.gradient} text-white font-semibold py-5 text-sm rounded-xl group/btn border-0 hover:opacity-90 transition-opacity`}
+              size="sm"
+              className={`bg-gradient-to-r ${colors.btnGradient} text-white font-semibold text-xs rounded-xl border-0 hover:opacity-90 transition-opacity h-8 px-3`}
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5">
                 Explore
-                <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
               </span>
             </Button>
           </CardContent>
