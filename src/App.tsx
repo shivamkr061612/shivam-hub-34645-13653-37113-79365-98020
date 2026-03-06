@@ -30,6 +30,8 @@ import KingBadgePurchase from "./pages/KingBadgePurchase";
 import Social from "./pages/Social";
 import ItemDetails from "./pages/ItemDetails";
 import DownloadPage from "./pages/DownloadPage";
+import DownloadLoading from "./pages/DownloadLoading";
+import DownloadLink from "./pages/DownloadLink";
 import Leaderboard from "./pages/Leaderboard";
 import TechAI from "./pages/TechAI";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -80,6 +82,8 @@ const AppContent = () => {
             <Route path="/tech-ai" element={<TechAI />} />
             <Route path="/item/:type/:id" element={<ItemDetails />} />
             <Route path="/download/:type/:id" element={<DownloadPage />} />
+            <Route path="/download-loading/:type/:id" element={<DownloadLoading />} />
+            <Route path="/download-link/:type/:id" element={<DownloadLink />} />
             <Route path="/user-upload" element={<UserUpload />} />
             <Route path="/promotions" element={<Promotions />} />
             {/* Legal Pages */}

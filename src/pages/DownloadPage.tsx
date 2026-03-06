@@ -4,12 +4,12 @@ import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Download, ChevronDown, Send, Info, AlertCircle, Loader2
+  Download, ChevronDown, Send, Info, AlertCircle, Loader2, FileDown, Package
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { doc, getDoc, increment, updateDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { KeyGenerationDialog } from '@/components/Content/KeyGenerationDialog';
@@ -22,7 +22,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Progress } from '@/components/ui/progress';
+
+interface Version {
+  name: string;
+  size: string;
+  link: string;
+}
 
 function TelegramButton() {
   const { settings } = useWebsiteSettings();
@@ -37,12 +42,6 @@ function TelegramButton() {
   );
 }
 
-interface Version {
-  name: string;
-  size: string;
-  link: string;
-}
-
 export default function DownloadPage() {
   const { type, id } = useParams();
   const navigate = useNavigate();
@@ -54,8 +53,6 @@ export default function DownloadPage() {
   const [loading, setLoading] = useState(!location.state?.item);
   const [showAuth, setShowAuth] = useState(false);
   const [showKeyGen, setShowKeyGen] = useState(false);
-  const [downloadingVersion, setDownloadingVersion] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -64,7 +61,6 @@ export default function DownloadPage() {
         setLoading(false);
         return;
       }
-
       if (type && id) {
         try {
           const itemDoc = await getDoc(doc(db, type, id));
@@ -85,7 +81,6 @@ export default function DownloadPage() {
         navigate('/');
       }
     };
-
     fetchItem();
   }, [type, id, location.state, navigate]);
 
@@ -94,101 +89,25 @@ export default function DownloadPage() {
     if (expiry) {
       const expiryTime = parseInt(expiry);
       const isValid = Date.now() < expiryTime;
-      if (!isValid) {
-        localStorage.removeItem('downloadKeyExpiry');
-      }
+      if (!isValid) localStorage.removeItem('downloadKeyExpiry');
       return isValid;
     }
     return false;
   };
 
-  const performDownload = async (downloadUrl: string, versionName: string) => {
-    if (!downloadUrl) {
-      toast.error('Download URL not available');
-      return;
-    }
-
-    setDownloadingVersion(versionName);
-    setProgress(0);
-
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) return prev;
-        return prev + Math.random() * 20;
-      });
-    }, 200);
-
-    try {
-      // Track download
-      if (user) {
-        try {
-          await addDoc(collection(db, 'downloads'), {
-            userId: user.uid,
-            userEmail: user.email,
-            itemId: item.id,
-            itemTitle: item.title,
-            versionName,
-            type: type,
-            downloadedAt: new Date().toISOString()
-          });
-        } catch (error) {
-          console.log('Download tracking skipped:', error);
-        }
-
-        // Update download count
-        try {
-          const itemRef = doc(db, type!, item.id);
-          await updateDoc(itemRef, {
-            downloadCount: increment(1)
-          });
-        } catch (error) {
-          console.log('Download count update skipped:', error);
-        }
-      }
-
-      setProgress(100);
-      
-      setTimeout(() => {
-        window.open(downloadUrl, '_blank');
-        toast.success('Download started! ✅');
-        setDownloadingVersion(null);
-        setProgress(0);
-      }, 500);
-
-    } catch (error) {
-      toast.error('Download failed ❌');
-      console.error('Download error:', error);
-    } finally {
-      clearInterval(progressInterval);
-    }
-  };
-
-  const handleDownloadClick = (downloadUrl: string, versionName: string) => {
+  const handleVersionClick = (version: Version) => {
     if (!user) {
       setShowAuth(true);
       return;
     }
-
-    // If user is verified, download directly
-    if (isVerified) {
-      performDownload(downloadUrl, versionName);
+    if (isVerified || !settings.keyGenerationEnabled || checkKeyValidity()) {
+      // Navigate to loading page, then download link page
+      navigate(`/download-loading/${type}/${id}`, {
+        state: { item, version, type }
+      });
       return;
     }
-
-    // If key generation is disabled, download directly
-    if (!settings.keyGenerationEnabled) {
-      performDownload(downloadUrl, versionName);
-      return;
-    }
-
-    // Check if key is valid
-    if (!checkKeyValidity()) {
-      setShowKeyGen(true);
-      return;
-    }
-
-    performDownload(downloadUrl, versionName);
+    setShowKeyGen(true);
   };
 
   if (loading) {
@@ -204,7 +123,6 @@ export default function DownloadPage() {
 
   if (!item) return null;
 
-  // Parse versions from item
   const versions: Version[] = item.versions || [
     { name: `${item.title} ${item.version || 'v1.0'}`, size: item.size || 'Unknown', link: item.downloadUrl }
   ];
@@ -213,7 +131,7 @@ export default function DownloadPage() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-6 max-w-2xl">
+      <main className="container mx-auto px-3 sm:px-4 py-6 max-w-2xl">
         {/* Thank you message */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -223,30 +141,31 @@ export default function DownloadPage() {
           <p>
             Thank you for downloading <span className="text-primary font-semibold">{item.title}</span> from our site.
           </p>
-          <p>The following are available links. Just press the button and the file will be automatically downloaded.</p>
+          <p className="text-sm mt-1">The following are available links. Just press the button and the file will be automatically downloaded.</p>
         </motion.div>
 
-        {/* Ad slot */}
         <AdSlot position="download_page" className="mb-4" />
 
-        {/* Ad placeholder */}
+        {/* Choose Version Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-card border-2 border-border rounded-2xl p-6 mb-6 flex flex-col items-center"
         >
-          <Button className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg mb-4">
-            <Download className="h-5 w-5 mr-2" />
-            DOWNLOAD NOW
-          </Button>
-          <p className="text-sm text-muted-foreground">Begin Download</p>
-          <div className="flex justify-between w-full mt-4 text-xs text-muted-foreground">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+            <Package className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-1">Choose Version</h2>
+          <p className="text-sm text-muted-foreground mb-2">Select the version you want to download</p>
+          <div className="flex justify-between w-full mt-2 text-xs text-muted-foreground">
             <span>TSHUB.IN</span>
-            <span className="text-primary">Download &gt;</span>
+            <span className="text-primary flex items-center gap-1">
+              <FileDown className="h-3 w-3" /> {versions.length} version{versions.length > 1 ? 's' : ''} available
+            </span>
           </div>
         </motion.div>
 
-        {/* Versions Accordion */}
+        {/* Versions List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -261,27 +180,23 @@ export default function DownloadPage() {
               >
                 <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-muted/50">
                   <div className="flex items-center justify-between w-full pr-2">
-                    <span className="font-semibold text-foreground text-left">{version.name}</span>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-200" />
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <FileDown className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <span className="font-semibold text-foreground block text-sm">{version.name}</span>
+                        <span className="text-xs text-muted-foreground">{version.size}</span>
+                      </div>
+                    </div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
-                  {downloadingVersion === version.name && progress > 0 && (
-                    <div className="mb-4">
-                      <Progress value={progress} className="h-2" />
-                      <p className="text-xs text-muted-foreground mt-1">Preparing download... {Math.round(progress)}%</p>
-                    </div>
-                  )}
                   <Button
-                    onClick={() => handleDownloadClick(version.link, version.name)}
-                    disabled={downloadingVersion === version.name}
+                    onClick={() => handleVersionClick(version)}
                     className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-5 rounded-xl"
                   >
-                    {downloadingVersion === version.name ? (
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    ) : (
-                      <Download className="h-5 w-5 mr-2" />
-                    )}
+                    <Download className="h-5 w-5 mr-2" />
                     Download ({version.size})
                   </Button>
                 </AccordionContent>
@@ -299,6 +214,8 @@ export default function DownloadPage() {
         >
           <TelegramButton />
         </motion.div>
+
+        <AdSlot position="download_page_bottom" className="mt-4" />
 
         {/* Important Notes */}
         <motion.div
@@ -328,13 +245,7 @@ export default function DownloadPage() {
         </motion.div>
       </main>
 
-      {/* Auth Dialog */}
-      <AuthDialog 
-        open={showAuth} 
-        onOpenChange={setShowAuth}
-      />
-      
-      {/* Key Generation Dialog */}
+      <AuthDialog open={showAuth} onOpenChange={setShowAuth} />
       <KeyGenerationDialog
         open={showKeyGen}
         onOpenChange={setShowKeyGen}
