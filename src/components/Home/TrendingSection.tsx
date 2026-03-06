@@ -143,16 +143,16 @@ function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardSty
           </div>
         </div>
         <ScrollArea className="w-full">
-          <div className="flex gap-4 pb-4">
+          <div className="flex gap-3 pb-4">
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex-shrink-0 w-[280px] bg-card rounded-2xl border border-border overflow-hidden cursor-pointer hover:border-primary/30 hover:shadow-lg transition-all"
+                className="flex-shrink-0 w-[240px] sm:w-[280px] bg-card rounded-2xl border border-border overflow-hidden cursor-pointer hover:border-primary/30 hover:shadow-lg transition-all"
                 onClick={() => onItemClick(item)}
               >
                 {item.thumbnail && (
                   <div className="relative h-36 overflow-hidden">
-                    <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
+                    <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-2 left-3 flex items-center gap-1">
                       <div className="w-2 h-2 rounded-full bg-accent" />
