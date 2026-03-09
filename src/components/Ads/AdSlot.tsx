@@ -20,6 +20,11 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const ads = docSnap.data();
+          // Check global ads toggle
+          if (ads._adsEnabled === false) {
+            setAdScript('');
+            return;
+          }
           const script = ads[position] || ads['global'] || '';
           setAdScript(script);
         }
