@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, Code } from 'lucide-react';
+import { Save, Plus, Trash2, Code, Link, Power } from 'lucide-react';
 
 const defaultPositions = [
   { key: 'global', label: 'Global Ad (fallback)', desc: 'Shows everywhere if no specific ad set' },
@@ -55,12 +56,16 @@ const defaultPositions = [
 
 export function AdminAds() {
   const [ads, setAds] = useState<Record<string, string>>({});
+  const [adsEnabled, setAdsEnabled] = useState(true);
+  const [shortenerApi, setShortenerApi] = useState('https://vplink.in/api');
+  const [shortenerApiKey, setShortenerApiKey] = useState('84d659adb9b96babaca0a088e1871b56cf074b54');
   const [customPositions, setCustomPositions] = useState<{ key: string; label: string }[]>([]);
   const [newKey, setNewKey] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadAds();
+    loadShortenerSettings();
   }, []);
 
   const loadAds = async () => {
@@ -68,9 +73,12 @@ export function AdminAds() {
       const docSnap = await getDoc(doc(db, 'settings', 'ads'));
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setAds(data as Record<string, string>);
+        setAdsEnabled(data._adsEnabled !== false);
+        const adData = { ...data };
+        delete adData._adsEnabled;
+        setAds(adData as Record<string, string>);
         const knownKeys = defaultPositions.map(p => p.key);
-        const custom = Object.keys(data)
+        const custom = Object.keys(adData)
           .filter(k => !knownKeys.includes(k) && k !== '_customPositions')
           .map(k => ({ key: k, label: k }));
         setCustomPositions(custom);
@@ -80,13 +88,41 @@ export function AdminAds() {
     }
   };
 
+  const loadShortenerSettings = async () => {
+    try {
+      const docSnap = await getDoc(doc(db, 'settings', 'shortener'));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.apiUrl) setShortenerApi(data.apiUrl);
+        if (data.apiKey) setShortenerApiKey(data.apiKey);
+      }
+    } catch (error) {
+      console.error('Failed to load shortener settings', error);
+    }
+  };
+
   const handleSave = async () => {
     setLoading(true);
     try {
-      await setDoc(doc(db, 'settings', 'ads'), ads, { merge: true });
+      await setDoc(doc(db, 'settings', 'ads'), { ...ads, _adsEnabled: adsEnabled }, { merge: true });
       toast.success('Ad settings saved!');
     } catch (error) {
       toast.error('Failed to save ads');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveShortener = async () => {
+    setLoading(true);
+    try {
+      await setDoc(doc(db, 'settings', 'shortener'), {
+        apiUrl: shortenerApi,
+        apiKey: shortenerApiKey,
+      });
+      toast.success('Shortener settings saved!');
+    } catch (error) {
+      toast.error('Failed to save shortener settings');
     } finally {
       setLoading(false);
     }
@@ -108,64 +144,126 @@ export function AdminAds() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Code className="h-5 w-5 text-primary" />
-          Ad Management
-        </CardTitle>
-        <CardDescription>Paste ad scripts for each position. King Badge users won't see ads. Supports HTML/JS.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {defaultPositions.map((pos) => (
-          <div key={pos.key} className="space-y-1.5 p-3 bg-muted/30 rounded-xl border">
-            <Label className="font-semibold text-xs">{pos.label}</Label>
-            <p className="text-[10px] text-muted-foreground">{pos.desc}</p>
-            <Textarea
-              value={ads[pos.key] || ''}
-              onChange={(e) => setAds({ ...ads, [pos.key]: e.target.value })}
-              placeholder={`<script>...</script> or HTML ad code`}
-              rows={2}
-              className="font-mono text-xs"
-            />
-          </div>
-        ))}
-
-        {customPositions.map((pos) => (
-          <div key={pos.key} className="space-y-1.5 p-3 bg-muted/30 rounded-xl border">
-            <div className="flex items-center justify-between">
-              <Label className="font-semibold text-xs">{pos.label} (Custom)</Label>
-              <Button variant="ghost" size="sm" onClick={() => removePosition(pos.key)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+    <div className="space-y-6">
+      {/* Global Ads Toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Power className="h-5 w-5 text-primary" />
+            Ads Master Switch
+          </CardTitle>
+          <CardDescription>Turn all ads on or off globally. When off, no ads will show anywhere on the site.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border">
+            <div>
+              <p className="font-semibold text-sm">All Ads</p>
+              <p className="text-xs text-muted-foreground">{adsEnabled ? 'Ads are currently showing' : 'All ads are hidden'}</p>
             </div>
-            <Textarea
-              value={ads[pos.key] || ''}
-              onChange={(e) => setAds({ ...ads, [pos.key]: e.target.value })}
-              placeholder="Ad script code"
-              rows={2}
+            <Switch checked={adsEnabled} onCheckedChange={setAdsEnabled} />
+          </div>
+          <Button onClick={handleSave} disabled={loading} className="w-full mt-4">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Shortener Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Link className="h-5 w-5 text-primary" />
+            Shortener Settings
+          </CardTitle>
+          <CardDescription>Configure the URL shortener used in key generation popup. Change API URL and API key.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold">Shortener API URL</Label>
+            <Input
+              value={shortenerApi}
+              onChange={(e) => setShortenerApi(e.target.value)}
+              placeholder="https://vplink.in/api"
               className="font-mono text-xs"
             />
           </div>
-        ))}
-
-        <div className="flex gap-2 p-3 border border-dashed rounded-xl">
-          <Input
-            value={newKey}
-            onChange={(e) => setNewKey(e.target.value)}
-            placeholder="Custom position name"
-            className="flex-1"
-          />
-          <Button variant="outline" onClick={addCustomPosition}>
-            <Plus className="h-4 w-4 mr-1" /> Add
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold">API Key</Label>
+            <Input
+              value={shortenerApiKey}
+              onChange={(e) => setShortenerApiKey(e.target.value)}
+              placeholder="Your API key"
+              className="font-mono text-xs"
+            />
+          </div>
+          <Button onClick={handleSaveShortener} disabled={loading} className="w-full">
+            <Save className="h-4 w-4 mr-2" />
+            {loading ? 'Saving...' : 'Save Shortener Settings'}
           </Button>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Button onClick={handleSave} disabled={loading} className="w-full">
-          <Save className="h-4 w-4 mr-2" />
-          {loading ? 'Saving...' : 'Save All Ad Settings'}
-        </Button>
-      </CardContent>
-    </Card>
+      {/* Ad Positions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Code className="h-5 w-5 text-primary" />
+            Ad Management
+          </CardTitle>
+          <CardDescription>Paste ad scripts for each position. King Badge users won't see ads. Supports HTML/JS.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {defaultPositions.map((pos) => (
+            <div key={pos.key} className="space-y-1.5 p-3 bg-muted/30 rounded-xl border">
+              <Label className="font-semibold text-xs">{pos.label}</Label>
+              <p className="text-[10px] text-muted-foreground">{pos.desc}</p>
+              <Textarea
+                value={ads[pos.key] || ''}
+                onChange={(e) => setAds({ ...ads, [pos.key]: e.target.value })}
+                placeholder={`<script>...</script> or HTML ad code`}
+                rows={2}
+                className="font-mono text-xs"
+              />
+            </div>
+          ))}
+
+          {customPositions.map((pos) => (
+            <div key={pos.key} className="space-y-1.5 p-3 bg-muted/30 rounded-xl border">
+              <div className="flex items-center justify-between">
+                <Label className="font-semibold text-xs">{pos.label} (Custom)</Label>
+                <Button variant="ghost" size="sm" onClick={() => removePosition(pos.key)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+              <Textarea
+                value={ads[pos.key] || ''}
+                onChange={(e) => setAds({ ...ads, [pos.key]: e.target.value })}
+                placeholder="Ad script code"
+                rows={2}
+                className="font-mono text-xs"
+              />
+            </div>
+          ))}
+
+          <div className="flex gap-2 p-3 border border-dashed rounded-xl">
+            <Input
+              value={newKey}
+              onChange={(e) => setNewKey(e.target.value)}
+              placeholder="Custom position name"
+              className="flex-1"
+            />
+            <Button variant="outline" onClick={addCustomPosition}>
+              <Plus className="h-4 w-4 mr-1" /> Add
+            </Button>
+          </div>
+
+          <Button onClick={handleSave} disabled={loading} className="w-full">
+            <Save className="h-4 w-4 mr-2" />
+            {loading ? 'Saving...' : 'Save All Ad Settings'}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

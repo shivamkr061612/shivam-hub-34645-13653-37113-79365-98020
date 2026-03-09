@@ -20,8 +20,6 @@ interface BypassSuccessInfo {
   remainingUses: number;
 }
 
-const SHORTENER_API = 'https://vplink.in/api';
-const API_KEY = '84d659adb9b96babaca0a088e1871b56cf074b54';
 const KEY_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours
 
 export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destinationUrl }: KeyGenerationDialogProps) {
@@ -31,6 +29,25 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
   const [inputCode, setInputCode] = useState('');
   const [waitingForCode, setWaitingForCode] = useState(false);
   const [bypassSuccess, setBypassSuccess] = useState<BypassSuccessInfo | null>(null);
+  const [shortenerApi, setShortenerApi] = useState('https://vplink.in/api');
+  const [shortenerApiKey, setShortenerApiKey] = useState('84d659adb9b96babaca0a088e1871b56cf074b54');
+
+  useEffect(() => {
+    // Load shortener settings from Firebase
+    const loadShortener = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, 'settings', 'shortener'));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.apiUrl) setShortenerApi(data.apiUrl);
+          if (data.apiKey) setShortenerApiKey(data.apiKey);
+        }
+      } catch (error) {
+        console.error('Failed to load shortener settings', error);
+      }
+    };
+    loadShortener();
+  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -113,7 +130,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         const bypassInfo = await checkAdminBypassKey(codeValue);
         if (bypassInfo) {
           setBypassSuccess(bypassInfo);
-          toast.success(`✅ Bypass key activated!`);
+          toast.success('Bypass key activated!');
           return;
         }
       }
@@ -146,7 +163,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         const expiryTime = Date.now() + KEY_EXPIRY_TIME;
         localStorage.setItem('downloadKeyExpiry', expiryTime.toString());
         
-        toast.success('✅ Verification successful! Download key activated for 24 hours.');
+        toast.success('Verification successful! Download key activated for 24 hours.');
         
         setTimeout(() => {
           onKeyGenerated();
@@ -165,7 +182,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
           }, 500);
         }, 1000);
       } else {
-        toast.error('❌ Invalid code. Only the generated code will work.');
+        toast.error('Invalid code. Only the generated code will work.');
         setInputCode('');
       }
     } catch (error) {
@@ -203,7 +220,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
       const verificationUrl = `${window.location.origin}/#/verification-success?userId=${user.uid}`;
       const alias = `vfy_${Date.now()}`;
 
-      const apiUrl = `${SHORTENER_API}?api=${API_KEY}&url=${encodeURIComponent(verificationUrl)}&alias=${alias}`;
+      const apiUrl = `${shortenerApi}?api=${shortenerApiKey}&url=${encodeURIComponent(verificationUrl)}&alias=${alias}`;
 
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -211,7 +228,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
       if (data.status === 'success' && data.shortenedUrl) {
         window.open(data.shortenedUrl, '_blank');
         setWaitingForCode(true);
-        toast.success('🔗 Please complete the verification and get your code!');
+        toast.success('Please complete the verification and get your code!');
       } else {
         toast.error('Failed to generate link. Please try again.');
         console.error('API Error:', data);
@@ -263,7 +280,8 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
             </div>
             
             <Button onClick={handleContinue} className="w-full">
-              ✅ Continue to Download
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Continue to Download
             </Button>
           </div>
         </DialogContent>
@@ -276,7 +294,8 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
       <DialogContent className="max-w-[90vw] sm:max-w-sm p-4 border-2 border-primary">
         <DialogHeader className="pb-2">
           <DialogTitle className="text-lg text-primary flex items-center gap-2">
-            🔑 Key Generation
+            <KeyRound className="h-5 w-5" />
+            Key Generation
           </DialogTitle>
           <DialogDescription className="text-sm">
             Get instant download access
@@ -286,7 +305,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         <div className="space-y-3 py-2">
           <div className="bg-primary/5 border border-primary/20 rounded p-3">
             <p className="text-xs text-muted-foreground">
-              ✓ 24 घंटे Free Downloads • ✓ No Extra Verification
+              24 Hours Free Downloads &bull; No Extra Verification
             </p>
           </div>
 
@@ -310,7 +329,9 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
               disabled={loading}
               className="w-full h-9"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "✅ Verify"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                <><CheckCircle2 className="h-4 w-4 mr-2" /> Verify</>
+              )}
             </Button>
           )}
           
@@ -320,7 +341,9 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
             disabled={loading}
             className="w-full h-9"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "🔑 Generate Key"}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+              <><KeyRound className="h-4 w-4 mr-2" /> Generate Key</>
+            )}
           </Button>
 
           <Button 
@@ -333,7 +356,8 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
             className="w-full h-9 text-xs"
             disabled={loading}
           >
-            💎 Buy Blue Tick - Skip Key Gen
+            <KeyRound className="h-4 w-4 mr-2" />
+            Buy Blue Tick - Skip Key Gen
           </Button>
         </div>
       </DialogContent>
