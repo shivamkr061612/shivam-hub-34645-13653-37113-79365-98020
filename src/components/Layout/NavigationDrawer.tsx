@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Upload, Megaphone, ChevronRight } from 'lucide-react';
+import { Package, Film, GraduationCap, Youtube, Send, MessageCircle, Shield, Gamepad2, Layers, FolderArchive, Crown, Trophy, Sparkles, FileText, Users, Phone, ScrollText, Home, Moon, Sun, Upload, Megaphone, ChevronRight, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +8,7 @@ import { ChannelDialog } from '@/components/Channels/ChannelDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useTheme } from 'next-themes';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { useKeyCountdown } from '@/hooks/useKeyCountdown';
 import { motion } from 'framer-motion';
 
 interface NavigationDrawerProps {
@@ -26,10 +27,11 @@ const mainGridItems = [
 
 export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) {
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const { isVerified } = useVerification();
   const { theme, setTheme } = useTheme();
   const { settings } = useWebsiteSettings();
+  const { timeRemaining, hasKey } = useKeyCountdown();
   const [showChannels, setShowChannels] = useState(false);
 
   const handleNavigation = (path?: string, action?: string, external?: boolean) => {
@@ -47,8 +49,6 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-
-  const showBuyBlueTickOption = user && !isVerified;
 
   const menuItems = [
     { icon: Upload, label: 'Upload Content', path: '/user-upload', color: 'text-[hsl(220,85%,52%)]' },
@@ -82,6 +82,21 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
 
           <ScrollArea className="flex-1 min-h-0">
             <div className="px-4 pb-6 space-y-5">
+              {/* Key Countdown Banner */}
+              {hasKey && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-accent/10 border border-accent/20"
+                >
+                  <Clock className="h-5 w-5 text-accent" />
+                  <div>
+                    <p className="text-xs font-bold text-foreground">Key Active</p>
+                    <p className="text-[11px] font-semibold text-accent">{timeRemaining} remaining</p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Category Grid */}
               <div>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mb-2.5 px-1">Categories</p>
@@ -143,8 +158,8 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                 </div>
               </div>
 
-              {/* King Badge CTA */}
-              {showBuyBlueTickOption && (
+              {/* King Badge CTA - always show if not verified */}
+              {!isVerified && (
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

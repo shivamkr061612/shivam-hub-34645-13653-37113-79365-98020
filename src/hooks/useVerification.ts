@@ -10,19 +10,20 @@ export function useVerification() {
 
   useEffect(() => {
     const checkVerification = async () => {
-      if (!user?.email) {
+      // For anonymous users, check by uid in verified_users
+      if (!user) {
         setIsVerified(false);
         setLoading(false);
         return;
       }
 
       try {
-        const verificationDoc = await getDoc(doc(db, 'verified_users', user.email));
+        // Check by email if available, otherwise by uid
+        const lookupId = user.email || user.uid;
+        const verificationDoc = await getDoc(doc(db, 'verified_users', lookupId));
         
         if (verificationDoc.exists()) {
           const data = verificationDoc.data();
-          
-          // Check if verification has expired
           if (data.expiresAt && new Date(data.expiresAt) < new Date()) {
             setIsVerified(false);
           } else {
@@ -40,7 +41,7 @@ export function useVerification() {
     };
 
     checkVerification();
-  }, [user?.email]);
+  }, [user?.uid, user?.email]);
 
   return { isVerified, loading };
 }

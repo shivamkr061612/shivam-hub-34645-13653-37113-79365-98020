@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
-import { Download, Send, CheckCircle, ArrowRight, Star, Shield } from 'lucide-react';
+import { Download, Send, CheckCircle, Star, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { toast } from 'sonner';
 
@@ -25,6 +26,7 @@ export default function DownloadLink() {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useWebsiteSettings();
+  const theme = useDownloadTheme();
   const [relatedPosts, setRelatedPosts] = useState<RelatedItem[]>([]);
   
   const { item, version, type } = location.state || {};
@@ -54,7 +56,6 @@ export default function DownloadLink() {
         });
       });
 
-      // Shuffle and pick 6
       const shuffled = allItems.sort(() => 0.5 - Math.random());
       setRelatedPosts(shuffled.slice(0, 6));
     } catch (error) {
@@ -74,17 +75,16 @@ export default function DownloadLink() {
   if (!item || !version) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} bg-background`}>
       <Header />
       <main className="container mx-auto px-3 sm:px-4 py-6 max-w-2xl">
-        {/* Success Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border-2 border-accent/30 rounded-2xl p-6 mb-6 text-center"
+          className={`${theme.card} border-2 ${theme.border} rounded-2xl p-6 mb-6 text-center`}
         >
-          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-8 w-8 text-accent" />
+          <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${theme.accent} flex items-center justify-center mx-auto mb-4`}>
+            <CheckCircle className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-1">Your Download is Ready!</h2>
           <p className="text-sm text-muted-foreground mb-1">{version.name}</p>
@@ -93,7 +93,6 @@ export default function DownloadLink() {
 
         <AdSlot position="download_link_top" className="mb-4" />
 
-        {/* Download Button */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -102,7 +101,7 @@ export default function DownloadLink() {
         >
           <Button
             onClick={handleDownload}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-6 rounded-xl text-lg shadow-lg"
+            className={`w-full bg-gradient-to-r ${theme.accent} hover:opacity-90 text-white font-bold py-6 rounded-xl text-lg shadow-lg`}
           >
             <Download className="h-6 w-6 mr-2" />
             DOWNLOAD NOW
@@ -110,7 +109,6 @@ export default function DownloadLink() {
           <p className="text-center text-xs text-muted-foreground mt-2">Click to start downloading</p>
         </motion.div>
 
-        {/* Telegram */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -128,7 +126,6 @@ export default function DownloadLink() {
 
         <AdSlot position="download_link_middle" className="mb-6" />
 
-        {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -136,14 +133,14 @@ export default function DownloadLink() {
             transition={{ delay: 0.3 }}
           >
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-6 bg-primary rounded-full" />
+              <div className={`w-1 h-6 bg-gradient-to-b ${theme.accent} rounded-full`} />
               <h3 className="text-lg font-bold text-foreground">Related Posts</h3>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {relatedPosts.map((rItem) => (
                 <div
                   key={rItem.id}
-                  className="bg-card border border-border rounded-xl overflow-hidden cursor-pointer hover:border-primary/30 hover:shadow-md transition-all"
+                  className={`${theme.card} border ${theme.border} rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all`}
                   onClick={() => navigate(`/item/${rItem.type}/${rItem.id}`, { state: { item: rItem } })}
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-muted">

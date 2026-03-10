@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
-  Download, ChevronDown, Send, Info, AlertCircle, Loader2, FileDown, Package
+  Download, Send, Info, AlertCircle, Loader2, FileDown, Package
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { KeyGenerationDialog } from '@/components/Content/KeyGenerationDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
+import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import {
   Accordion,
@@ -29,19 +28,6 @@ interface Version {
   link: string;
 }
 
-function TelegramButton() {
-  const { settings } = useWebsiteSettings();
-  return (
-    <Button
-      onClick={() => window.open(settings.telegramLink || 'https://t.me/techshivam', '_blank')}
-      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-5 rounded-xl"
-    >
-      <Send className="h-5 w-5 mr-2" />
-      Join Our Telegram channel
-    </Button>
-  );
-}
-
 export default function DownloadPage() {
   const { type, id } = useParams();
   const navigate = useNavigate();
@@ -49,9 +35,9 @@ export default function DownloadPage() {
   const { user } = useAuth();
   const { isVerified } = useVerification();
   const { settings } = useWebsiteSettings();
+  const theme = useDownloadTheme();
   const [item, setItem] = useState<any>(location.state?.item || null);
   const [loading, setLoading] = useState(!location.state?.item);
-  const [showAuth, setShowAuth] = useState(false);
   const [showKeyGen, setShowKeyGen] = useState(false);
 
   useEffect(() => {
@@ -96,12 +82,7 @@ export default function DownloadPage() {
   };
 
   const handleVersionClick = (version: Version) => {
-    if (!user) {
-      setShowAuth(true);
-      return;
-    }
     if (isVerified || !settings.keyGenerationEnabled || checkKeyValidity()) {
-      // Navigate to loading page, then download link page
       navigate(`/download-loading/${type}/${id}`, {
         state: { item, version, type }
       });
@@ -128,11 +109,10 @@ export default function DownloadPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} bg-background`}>
       <Header />
       
       <main className="container mx-auto px-3 sm:px-4 py-6 max-w-2xl">
-        {/* Thank you message */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -141,19 +121,18 @@ export default function DownloadPage() {
           <p>
             Thank you for downloading <span className="text-primary font-semibold">{item.title}</span> from our site.
           </p>
-          <p className="text-sm mt-1">The following are available links. Just press the button and the file will be automatically downloaded.</p>
+          <p className="text-sm mt-1">Select the version you want to download.</p>
         </motion.div>
 
         <AdSlot position="download_page" className="mb-4" />
 
-        {/* Choose Version Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-card border-2 border-border rounded-2xl p-6 mb-6 flex flex-col items-center"
+          className={`${theme.card} border-2 ${theme.border} rounded-2xl p-6 mb-6 flex flex-col items-center`}
         >
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <Package className="h-8 w-8 text-primary" />
+          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${theme.accent} flex items-center justify-center mb-4`}>
+            <Package className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-1">Choose Version</h2>
           <p className="text-sm text-muted-foreground mb-2">Select the version you want to download</p>
@@ -165,7 +144,6 @@ export default function DownloadPage() {
           </div>
         </motion.div>
 
-        {/* Versions List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -176,13 +154,13 @@ export default function DownloadPage() {
               <AccordionItem 
                 key={index} 
                 value={`version-${index}`}
-                className="bg-card border-2 border-border rounded-2xl overflow-hidden"
+                className={`${theme.card} border-2 ${theme.border} rounded-2xl overflow-hidden`}
               >
                 <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-muted/50">
                   <div className="flex items-center justify-between w-full pr-2">
                     <div className="flex items-center gap-3 text-left">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <FileDown className="h-5 w-5 text-primary" />
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${theme.accent} flex items-center justify-center flex-shrink-0`}>
+                        <FileDown className="h-5 w-5 text-white" />
                       </div>
                       <div>
                         <span className="font-semibold text-foreground block text-sm">{version.name}</span>
@@ -194,7 +172,7 @@ export default function DownloadPage() {
                 <AccordionContent className="px-4 pb-4">
                   <Button
                     onClick={() => handleVersionClick(version)}
-                    className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-5 rounded-xl"
+                    className={`w-full bg-gradient-to-r ${theme.accent} hover:opacity-90 text-white font-bold py-5 rounded-xl`}
                   >
                     <Download className="h-5 w-5 mr-2" />
                     Download ({version.size})
@@ -205,19 +183,23 @@ export default function DownloadPage() {
           </Accordion>
         </motion.div>
 
-        {/* Join Telegram */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="mt-8"
         >
-          <TelegramButton />
+          <Button
+            onClick={() => window.open(settings.telegramLink || 'https://t.me/techshivam', '_blank')}
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-5 rounded-xl"
+          >
+            <Send className="h-5 w-5 mr-2" />
+            Join Our Telegram channel
+          </Button>
         </motion.div>
 
         <AdSlot position="download_page_bottom" className="mt-4" />
 
-        {/* Important Notes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -231,11 +213,7 @@ export default function DownloadPage() {
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-              <span>Some GAMES or APK are specially Optimized and Built for specific Processor Architecture. If you want to know about your CPU and GPU, please use <span className="text-blue-500 font-medium">CPU-Z</span>.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-              <span>Please use our installation note to know how to install APK files.</span>
+              <span>Some GAMES or APK are specially Optimized and Built for specific Processor Architecture.</span>
             </li>
             <li className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
@@ -245,7 +223,6 @@ export default function DownloadPage() {
         </motion.div>
       </main>
 
-      <AuthDialog open={showAuth} onOpenChange={setShowAuth} />
       <KeyGenerationDialog
         open={showKeyGen}
         onOpenChange={setShowKeyGen}

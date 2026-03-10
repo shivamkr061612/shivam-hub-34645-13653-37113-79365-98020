@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, User, Sun, Moon, Bell } from 'lucide-react';
+import { Menu, Sun, Moon, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthDialog } from '@/components/Auth/AuthDialog';
-import { ProfileDrawer } from '@/components/Profile/ProfileDrawer';
 import { NavigationDrawer } from '@/components/Layout/NavigationDrawer';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { useVerification } from '@/hooks/useVerification';
 import { KingBadge } from '@/components/ui/KingBadge';
+import { useKeyCountdown } from '@/hooks/useKeyCountdown';
 
 export function Header() {
   const { user } = useAuth();
   const { settings } = useWebsiteSettings();
   const { isVerified } = useVerification();
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+  const { timeRemaining, hasKey } = useKeyCountdown();
   const [showNav, setShowNav] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -75,12 +73,19 @@ export function Header() {
               </div>
               <h1 className="text-base sm:text-lg font-extrabold gradient-text flex items-center gap-1.5 leading-none">
                 {settings.siteName}
-                {user && isVerified && <KingBadge size="lg" />}
+                {isVerified && <KingBadge size="lg" />}
               </h1>
             </div>
           </div>
 
           <div className="flex items-center gap-1">
+            {/* Key Countdown */}
+            {hasKey && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-accent/10 border border-accent/20 mr-1">
+                <Clock className="h-3 w-3 text-accent" />
+                <span className="text-[10px] font-bold text-accent">{timeRemaining}</span>
+              </div>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -89,30 +94,10 @@ export function Header() {
             >
               {isDark ? <Sun className="h-4 w-4 text-[hsl(42,95%,55%)]" /> : <Moon className="h-4 w-4" />}
             </Button>
-            {user ? (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setShowProfile(true)}
-                className="h-9 w-9 rounded-xl hover:bg-primary/10"
-              >
-                <User className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={() => setShowAuthDialog(true)} 
-                size="sm"
-                className="h-8 px-4 rounded-xl text-xs font-bold bg-primary hover:bg-primary/90"
-              >
-                Login
-              </Button>
-            )}
           </div>
         </div>
       </header>
 
-      <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
-      <ProfileDrawer open={showProfile} onOpenChange={setShowProfile} />
       <NavigationDrawer open={showNav} onOpenChange={setShowNav} />
     </>
   );
