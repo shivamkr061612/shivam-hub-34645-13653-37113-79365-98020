@@ -24,7 +24,7 @@ interface SpecialOffer {
 }
 
 const BlueTickPurchase = () => {
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -37,16 +37,15 @@ const BlueTickPurchase = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; percentOff: number } | null>(null);
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [specialOffers, setSpecialOffers] = useState<SpecialOffer[]>([]);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
-    }
     fetchSettings();
-    checkPendingRequest();
     fetchSpecialOffers();
-  }, [user]);
+    if (isLoggedIn) {
+      checkPendingRequest();
+    }
+  }, [isLoggedIn]);
 
   const fetchSpecialOffers = async () => {
     try {
