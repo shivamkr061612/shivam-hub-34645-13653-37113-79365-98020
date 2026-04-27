@@ -27,7 +27,7 @@ const mainGridItems = [
 
 export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSubAdmin, isAnyAdmin } = useAuth();
   const { isVerified } = useVerification();
   const { theme, setTheme } = useTheme();
   const { settings } = useWebsiteSettings();
