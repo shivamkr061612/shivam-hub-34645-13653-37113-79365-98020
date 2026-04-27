@@ -51,6 +51,8 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
     }
   }, [adScript]);
 
+  // Hide ads on admin routes
+  if (isAdminRoute) return null;
   // Hide ads for King Badge holders
   if (isVerified) return null;
   if (!adScript) return null;
