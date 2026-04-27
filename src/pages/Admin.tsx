@@ -48,7 +48,7 @@ const Admin = () => {
   }
 
   // Build tab list based on role
-  type Tab = { value: string; label: string; component: JSX.Element };
+  type Tab = { value: string; label: string; component: React.ReactNode };
   const allTabs: Tab[] = [
     { value: 'upload', label: 'Upload', component: <AdminUpload /> },
     { value: 'myapps', label: 'My Apps', component: <AdminMyApps /> },
