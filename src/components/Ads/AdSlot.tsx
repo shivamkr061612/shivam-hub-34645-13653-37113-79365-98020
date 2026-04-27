@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useVerification } from '@/hooks/useVerification';
+import { useLocation } from 'react-router-dom';
 
 interface AdSlotProps {
   position: string;
@@ -12,6 +13,8 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
   const [adScript, setAdScript] = useState<string>('');
   const containerRef = useRef<HTMLDivElement>(null);
   const { isVerified } = useVerification();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const fetchAd = async () => {
