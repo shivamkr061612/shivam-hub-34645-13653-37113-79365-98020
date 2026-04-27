@@ -258,6 +258,8 @@ const BlueTickPurchase = () => {
       </div>
     );
   }
+
+  return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container px-3 sm:px-4 py-8 sm:py-12">
