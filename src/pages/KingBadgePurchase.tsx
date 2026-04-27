@@ -10,9 +10,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, getDoc, addDoc, collection, query, where, getDocs, updateDoc, increment, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { CheckCircle2, CreditCard, Clock, Ticket, X, Sparkles, Crown } from 'lucide-react';
+import { CheckCircle2, CreditCard, Clock, Ticket, X, Sparkles, Crown, LogIn } from 'lucide-react';
 import { DotLoader } from '@/components/ui/DotLoader';
 import { PageTransition } from '@/components/ui/PageTransition';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 
 interface SpecialOffer {
   id: string;
