@@ -10,9 +10,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { doc, getDoc, addDoc, collection, query, where, getDocs, updateDoc, increment, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
-import { CheckCircle2, CreditCard, Clock, Ticket, X, Sparkles, Crown } from 'lucide-react';
+import { CheckCircle2, CreditCard, Clock, Ticket, X, Sparkles, Crown, LogIn } from 'lucide-react';
 import { DotLoader } from '@/components/ui/DotLoader';
 import { PageTransition } from '@/components/ui/PageTransition';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 
 interface SpecialOffer {
   id: string;
@@ -23,7 +24,7 @@ interface SpecialOffer {
 }
 
 const BlueTickPurchase = () => {
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -36,16 +37,15 @@ const BlueTickPurchase = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; percentOff: number } | null>(null);
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [specialOffers, setSpecialOffers] = useState<SpecialOffer[]>([]);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
-    }
     fetchSettings();
-    checkPendingRequest();
     fetchSpecialOffers();
-  }, [user]);
+    if (isLoggedIn) {
+      checkPendingRequest();
+    }
+  }, [isLoggedIn]);
 
   const fetchSpecialOffers = async () => {
     try {
@@ -223,6 +223,38 @@ const BlueTickPurchase = () => {
             </CardContent>
           </Card>
         </div>
+      </div>
+    );
+  }
+
+  // Require real login (not anonymous) to buy King Badge
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container px-4 py-12">
+          <Card className="max-w-md mx-auto border-2 border-primary/30">
+            <CardHeader className="text-center">
+              <div className="h-16 w-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                <Crown className="h-8 w-8 text-white" fill="white" />
+              </div>
+              <CardTitle>Sign in to continue</CardTitle>
+              <CardDescription>
+                King Badge purchase requires a real account so we can link your benefits permanently.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button onClick={() => setShowAuth(true)} className="w-full">
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In / Sign Up
+              </Button>
+              <Button variant="ghost" onClick={() => navigate('/')} className="w-full">
+                Back to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        <AuthDialog open={showAuth} onOpenChange={setShowAuth} title="Sign in to buy King Badge" description="Use email or Google. Quick & free." />
       </div>
     );
   }

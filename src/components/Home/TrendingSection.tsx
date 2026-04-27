@@ -151,12 +151,17 @@ function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardSty
                 onClick={() => onItemClick(item)}
               >
                 {item.thumbnail && (
-                  <div className="relative h-44 overflow-hidden">
-                    <img src={item.thumbnail} alt={item.title} className="w-full h-full object-contain bg-muted" loading="lazy" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="relative w-full aspect-[16/10] overflow-hidden bg-muted">
+                    <img
+                      src={item.thumbnail}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                     <div className="absolute bottom-2 left-3 flex items-center gap-1">
                       <div className="w-2 h-2 rounded-full bg-accent" />
-                      <span className="text-white text-xs font-medium">{item.category || item.type}</span>
+                      <span className="text-white text-xs font-medium drop-shadow">{item.category || item.type}</span>
                     </div>
                   </div>
                 )}

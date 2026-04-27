@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, Sun, Moon, Clock } from 'lucide-react';
+import { Menu, Sun, Moon, Clock, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavigationDrawer } from '@/components/Layout/NavigationDrawer';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { useVerification } from '@/hooks/useVerification';
 import { KingBadge } from '@/components/ui/KingBadge';
 import { useKeyCountdown } from '@/hooks/useKeyCountdown';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, isLoggedIn, signOut } = useAuth();
   const { settings } = useWebsiteSettings();
   const { isVerified } = useVerification();
   const { timeRemaining, hasKey } = useKeyCountdown();
   const [showNav, setShowNav] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -94,11 +98,54 @@ export function Header() {
             >
               {isDark ? <Sun className="h-4 w-4 text-[hsl(42,95%,55%)]" /> : <Moon className="h-4 w-4" />}
             </Button>
+
+            {/* Auth: Login button or Profile menu */}
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10">
+                    {user?.photoURL ? (
+                      <img src={user.photoURL} alt="profile" className="h-7 w-7 rounded-full object-cover" />
+                    ) : (
+                      <UserIcon className="h-4 w-4" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-xs">
+                    <div className="font-semibold truncate">{user?.displayName || 'Account'}</div>
+                    <div className="text-muted-foreground truncate font-normal">{user?.email}</div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={async () => {
+                      await signOut();
+                      toast.success('Signed out');
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAuth(true)}
+                className="h-9 px-3 rounded-xl hover:bg-primary/10 gap-1.5"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="text-xs font-semibold hidden sm:inline">Login</span>
+              </Button>
+            )}
           </div>
         </div>
       </header>
 
       <NavigationDrawer open={showNav} onOpenChange={setShowNav} />
+      <AuthDialog open={showAuth} onOpenChange={setShowAuth} />
     </>
   );
 }
