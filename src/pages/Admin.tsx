@@ -33,17 +33,89 @@ import { AdminAds } from '@/components/Admin/AdminAds';
 import { AdminTrending } from '@/components/Admin/AdminTrending';
 import { AdminCacheControl } from '@/components/Admin/AdminCacheControl';
 import { AdminSEO } from '@/components/Admin/AdminSEO';
-import { Shield } from 'lucide-react';
+import { AdminSubAdmins } from '@/components/Admin/AdminSubAdmins';
+import { Shield, ShieldCheck } from 'lucide-react';
 
 const Admin = () => {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, isSubAdmin, isAnyAdmin, subAdminPermissions, loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!isAdmin) {
+  if (!isAnyAdmin) {
     return <Navigate to="/" replace />;
+  }
+
+  // Build tab list based on role
+  type Tab = { value: string; label: string; component: JSX.Element };
+  const allTabs: Tab[] = [
+    { value: 'upload', label: 'Upload', component: <AdminUpload /> },
+    { value: 'myapps', label: 'My Apps', component: <AdminMyApps /> },
+    { value: 'edit', label: 'Edit', component: <AdminEdit /> },
+    { value: 'users', label: 'Users', component: <AdminUsers /> },
+    { value: 'subadmins', label: 'Sub-Admins', component: <AdminSubAdmins /> },
+    { value: 'settings', label: 'Settings', component: <AdminWebsiteSettings /> },
+    { value: 'theme', label: 'Theme', component: <AdminTheme /> },
+    { value: 'notice', label: 'Notice', component: <AdminNotice /> },
+    { value: 'leaderboard', label: 'Leaderboard', component: <AdminLeaderboard /> },
+    { value: 'notifications', label: 'Notifications', component: <AdminNotifications /> },
+    { value: 'maintenance', label: 'Maintenance', component: <AdminMaintenance /> },
+    { value: 'messages', label: 'Messages', component: <AdminMessages /> },
+    { value: 'verification', label: 'Verification', component: <AdminVerification /> },
+    { value: 'bluetick-settings', label: 'Blue Tick Settings', component: <AdminBlueTickSettings /> },
+    { value: 'bluetick-requests', label: 'Blue Tick Requests', component: <AdminBlueTickRequests /> },
+    { value: 'special-offers', label: 'Special Offers', component: <AdminSpecialOffers /> },
+    { value: 'popup', label: 'Popup', component: <AdminPopup /> },
+    { value: 'sections', label: 'Sections', component: <AdminSectionSettings /> },
+    { value: 'coupons', label: 'Coupons', component: <AdminCoupons /> },
+    { value: 'livechat', label: 'Live Chat', component: <AdminLiveChat /> },
+    { value: 'feedback', label: 'Feedback', component: <AdminFeedback /> },
+    { value: 'shayaris', label: 'Shayaris', component: <AdminShayaris /> },
+    { value: 'push-notifications', label: 'Push Notifications', component: <AdminPushNotifications /> },
+    { value: 'avatars', label: 'Avatars', component: <AdminAvatars /> },
+    { value: 'key-generation', label: 'Generate Keys', component: <AdminKeyGeneration /> },
+    { value: 'promotional-banners', label: 'Promo Banners', component: <AdminPromotionalBanners /> },
+    { value: 'user-uploads', label: 'User Uploads', component: <AdminUserUploads /> },
+    { value: 'promotion-settings', label: 'Promotions', component: <AdminPromotionSettings /> },
+    { value: 'trending', label: 'Trending', component: <AdminTrending /> },
+    { value: 'ads', label: 'Ads', component: <AdminAds /> },
+    { value: 'seo', label: 'SEO', component: <AdminSEO /> },
+    { value: 'cache', label: 'Cache', component: <AdminCacheControl /> },
+  ];
+
+  // Map permissions -> allowed tabs for sub-admins
+  const permTabMap: Record<string, string[]> = {
+    upload: ['upload', 'myapps'],
+    edit: ['edit', 'myapps'],
+    messages: ['messages'],
+    feedback: ['feedback'],
+  };
+
+  let visibleTabs: Tab[];
+  if (isAdmin) {
+    visibleTabs = allTabs;
+  } else {
+    const allowed = new Set<string>();
+    subAdminPermissions.forEach(p => {
+      (permTabMap[p] || []).forEach(t => allowed.add(t));
+    });
+    visibleTabs = allTabs.filter(t => allowed.has(t.value));
+  }
+
+  if (visibleTabs.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container px-4 py-12 text-center">
+          <ShieldCheck className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+          <h2 className="text-xl font-bold">No permissions assigned</h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            Ask the super admin to grant you permissions.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -51,170 +123,35 @@ const Admin = () => {
       <Header />
       <div className="container px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
-          <Shield className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Admin Panel</h1>
+          {isAdmin ? (
+            <Shield className="h-8 w-8 text-primary" />
+          ) : (
+            <ShieldCheck className="h-8 w-8 text-primary" />
+          )}
+          <div>
+            <h1 className="text-3xl font-bold">{isAdmin ? 'Admin Panel' : 'Sub-Admin Panel'}</h1>
+            {isSubAdmin && (
+              <p className="text-xs text-muted-foreground">
+                Limited access • {subAdminPermissions.length} permission(s) granted
+              </p>
+            )}
+          </div>
         </div>
 
-        <Tabs defaultValue="upload" className="space-y-6">
-        <TabsList className="flex flex-wrap gap-2 overflow-x-auto">
-            <TabsTrigger value="upload" className="whitespace-nowrap text-sm">Upload</TabsTrigger>
-            <TabsTrigger value="myapps" className="whitespace-nowrap text-sm">My Apps</TabsTrigger>
-            <TabsTrigger value="edit" className="whitespace-nowrap text-sm">Edit</TabsTrigger>
-            <TabsTrigger value="users" className="whitespace-nowrap text-sm">Users</TabsTrigger>
-            <TabsTrigger value="settings" className="whitespace-nowrap text-sm">Settings</TabsTrigger>
-            <TabsTrigger value="theme" className="whitespace-nowrap text-sm">Theme</TabsTrigger>
-            <TabsTrigger value="notice" className="whitespace-nowrap text-sm">Notice</TabsTrigger>
-            <TabsTrigger value="leaderboard" className="whitespace-nowrap text-sm">Leaderboard</TabsTrigger>
-            <TabsTrigger value="notifications" className="whitespace-nowrap text-sm">Notifications</TabsTrigger>
-            <TabsTrigger value="maintenance" className="whitespace-nowrap text-sm">Maintenance</TabsTrigger>
-            <TabsTrigger value="messages" className="whitespace-nowrap text-sm">Messages</TabsTrigger>
-            <TabsTrigger value="verification" className="whitespace-nowrap text-sm">Verification</TabsTrigger>
-            <TabsTrigger value="bluetick-settings" className="whitespace-nowrap text-sm">Blue Tick Settings</TabsTrigger>
-            <TabsTrigger value="bluetick-requests" className="whitespace-nowrap text-sm">Blue Tick Requests</TabsTrigger>
-            <TabsTrigger value="special-offers" className="whitespace-nowrap text-sm">Special Offers</TabsTrigger>
-            <TabsTrigger value="popup" className="whitespace-nowrap text-sm">Popup</TabsTrigger>
-            <TabsTrigger value="sections" className="whitespace-nowrap text-sm">Sections</TabsTrigger>
-            <TabsTrigger value="coupons" className="whitespace-nowrap text-sm">Coupons</TabsTrigger>
-            <TabsTrigger value="livechat" className="whitespace-nowrap text-sm">Live Chat</TabsTrigger>
-            <TabsTrigger value="feedback" className="whitespace-nowrap text-sm">Feedback</TabsTrigger>
-            <TabsTrigger value="shayaris" className="whitespace-nowrap text-sm">Shayaris</TabsTrigger>
-            <TabsTrigger value="push-notifications" className="whitespace-nowrap text-sm">Push Notifications</TabsTrigger>
-            <TabsTrigger value="avatars" className="whitespace-nowrap text-sm">Avatars</TabsTrigger>
-            <TabsTrigger value="key-generation" className="whitespace-nowrap text-sm">Generate Keys</TabsTrigger>
-            <TabsTrigger value="promotional-banners" className="whitespace-nowrap text-sm">Promo Banners</TabsTrigger>
-            <TabsTrigger value="user-uploads" className="whitespace-nowrap text-sm">User Uploads</TabsTrigger>
-            <TabsTrigger value="promotion-settings" className="whitespace-nowrap text-sm">Promotions</TabsTrigger>
-            <TabsTrigger value="trending" className="whitespace-nowrap text-sm">Trending</TabsTrigger>
-            <TabsTrigger value="ads" className="whitespace-nowrap text-sm">Ads</TabsTrigger>
-            <TabsTrigger value="seo" className="whitespace-nowrap text-sm">SEO</TabsTrigger>
-            <TabsTrigger value="cache" className="whitespace-nowrap text-sm">Cache</TabsTrigger>
+        <Tabs defaultValue={visibleTabs[0].value} className="space-y-6">
+          <TabsList className="flex flex-wrap gap-2 overflow-x-auto h-auto">
+            {visibleTabs.map(t => (
+              <TabsTrigger key={t.value} value={t.value} className="whitespace-nowrap text-sm">
+                {t.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
-
-          <TabsContent value="upload">
-            <AdminUpload />
-          </TabsContent>
-
-          <TabsContent value="myapps">
-            <AdminMyApps />
-          </TabsContent>
-
-          <TabsContent value="edit">
-            <AdminEdit />
-          </TabsContent>
-
-          <TabsContent value="users">
-            <AdminUsers />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <AdminWebsiteSettings />
-          </TabsContent>
-
-          <TabsContent value="theme">
-            <AdminTheme />
-          </TabsContent>
-
-          <TabsContent value="notice">
-            <AdminNotice />
-          </TabsContent>
-
-          <TabsContent value="leaderboard">
-            <AdminLeaderboard />
-          </TabsContent>
-
-          <TabsContent value="notifications">
-            <AdminNotifications />
-          </TabsContent>
-
-          <TabsContent value="maintenance">
-            <AdminMaintenance />
-          </TabsContent>
-
-          <TabsContent value="messages">
-            <AdminMessages />
-          </TabsContent>
-
-          <TabsContent value="verification">
-            <AdminVerification />
-          </TabsContent>
-
-          <TabsContent value="bluetick-settings">
-            <AdminBlueTickSettings />
-          </TabsContent>
-
-          <TabsContent value="bluetick-requests">
-            <AdminBlueTickRequests />
-          </TabsContent>
-
-          <TabsContent value="special-offers">
-            <AdminSpecialOffers />
-          </TabsContent>
-
-          <TabsContent value="popup">
-            <AdminPopup />
-          </TabsContent>
-
-          <TabsContent value="sections">
-            <AdminSectionSettings />
-          </TabsContent>
-
-          <TabsContent value="coupons">
-            <AdminCoupons />
-          </TabsContent>
-
-          <TabsContent value="livechat">
-            <AdminLiveChat />
-          </TabsContent>
-
-          <TabsContent value="feedback">
-            <AdminFeedback />
-          </TabsContent>
-
-          <TabsContent value="shayaris">
-            <AdminShayaris />
-          </TabsContent>
-
-          <TabsContent value="push-notifications">
-            <AdminPushNotifications />
-          </TabsContent>
-
-          <TabsContent value="avatars">
-            <AdminAvatars />
-          </TabsContent>
-
-          <TabsContent value="key-generation">
-            <AdminKeyGeneration />
-          </TabsContent>
-
-          <TabsContent value="promotional-banners">
-            <AdminPromotionalBanners />
-          </TabsContent>
-
-          <TabsContent value="user-uploads">
-            <AdminUserUploads />
-          </TabsContent>
-
-          <TabsContent value="promotion-settings">
-            <AdminPromotionSettings />
-          </TabsContent>
-
-          <TabsContent value="trending">
-            <AdminTrending />
-          </TabsContent>
-
-          <TabsContent value="ads">
-            <AdminAds />
-          </TabsContent>
-
-          <TabsContent value="seo">
-            <AdminSEO />
-          </TabsContent>
-
-          <TabsContent value="cache">
-            <AdminCacheControl />
-          </TabsContent>
+          {visibleTabs.map(t => (
+            <TabsContent key={t.value} value={t.value}>
+              {t.component}
+            </TabsContent>
+          ))}
         </Tabs>
-
       </div>
     </div>
   );
