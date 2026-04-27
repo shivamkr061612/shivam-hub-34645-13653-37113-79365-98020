@@ -14,18 +14,18 @@ export function KingBadgePrompt() {
   useEffect(() => {
     if (!user || isVerified) return;
 
-    // Show prompt every 3 minutes
+    // Show prompt every 1 minute
     const interval = setInterval(() => {
       setShow(true);
       // Auto hide after 8s
       setTimeout(() => setShow(false), 8000);
-    }, 180000);
+    }, 60000);
 
-    // Show first after 30s
+    // Show first after 20s
     const firstTimeout = setTimeout(() => {
       setShow(true);
       setTimeout(() => setShow(false), 8000);
-    }, 30000);
+    }, 20000);
 
     return () => {
       clearInterval(interval);
