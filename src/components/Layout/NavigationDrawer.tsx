@@ -218,15 +218,17 @@ export function NavigationDrawer({ open, onOpenChange }: NavigationDrawerProps) 
                 </div>
               </div>
 
-              {/* Admin */}
-              {isAdmin && (
+              {/* Admin / Sub-admin */}
+              {isAnyAdmin && (
                 <div className="pt-1">
                   <button
                     onClick={() => handleNavigation('/admin')}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/10 hover:bg-primary/15 border border-primary/20 transition-colors"
                   >
                     <Shield className="h-5 w-5 text-primary" />
-                    <span className="text-sm font-bold text-primary">Admin Panel</span>
+                    <span className="text-sm font-bold text-primary">
+                      {isAdmin ? 'Admin Panel' : 'Sub-Admin Panel'}
+                    </span>
                     <ChevronRight className="h-4 w-4 text-primary/50 ml-auto" />
                   </button>
                 </div>
