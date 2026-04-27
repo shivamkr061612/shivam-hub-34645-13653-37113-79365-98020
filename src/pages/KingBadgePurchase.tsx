@@ -227,7 +227,37 @@ const BlueTickPurchase = () => {
     );
   }
 
-  return (
+  // Require real login (not anonymous) to buy King Badge
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container px-4 py-12">
+          <Card className="max-w-md mx-auto border-2 border-primary/30">
+            <CardHeader className="text-center">
+              <div className="h-16 w-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                <Crown className="h-8 w-8 text-white" fill="white" />
+              </div>
+              <CardTitle>Sign in to continue</CardTitle>
+              <CardDescription>
+                King Badge purchase requires a real account so we can link your benefits permanently.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button onClick={() => setShowAuth(true)} className="w-full">
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In / Sign Up
+              </Button>
+              <Button variant="ghost" onClick={() => navigate('/')} className="w-full">
+                Back to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        <AuthDialog open={showAuth} onOpenChange={setShowAuth} title="Sign in to buy King Badge" description="Use email or Google. Quick & free." />
+      </div>
+    );
+  }
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container px-3 sm:px-4 py-8 sm:py-12">
