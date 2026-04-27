@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, Sun, Moon, Clock } from 'lucide-react';
+import { Menu, Sun, Moon, Clock, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavigationDrawer } from '@/components/Layout/NavigationDrawer';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { useVerification } from '@/hooks/useVerification';
 import { KingBadge } from '@/components/ui/KingBadge';
 import { useKeyCountdown } from '@/hooks/useKeyCountdown';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, isLoggedIn, signOut } = useAuth();
   const { settings } = useWebsiteSettings();
   const { isVerified } = useVerification();
   const { timeRemaining, hasKey } = useKeyCountdown();
   const [showNav, setShowNav] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
