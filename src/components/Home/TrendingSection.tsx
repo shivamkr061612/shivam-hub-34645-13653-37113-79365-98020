@@ -181,7 +181,11 @@ function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardSty
                     {item.version && <span>v{item.version}</span>}
                     {item.size && <span>{item.size}</span>}
                   </div>
-                  <Button size="sm" className="w-full mt-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs h-8 font-semibold hover:shadow-lg transition-all">
+                  <Button
+                    size="sm"
+                    onClick={(e) => { e.stopPropagation(); triggerAd(() => onItemClick(item)); }}
+                    className="w-full mt-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs h-8 font-semibold hover:shadow-lg transition-all"
+                  >
                     Download
                   </Button>
                 </div>
