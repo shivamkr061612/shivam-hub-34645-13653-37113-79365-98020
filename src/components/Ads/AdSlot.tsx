@@ -64,6 +64,10 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
 
   // Hide ads on admin routes
   if (isAdminRoute) return null;
+  // Hide ads on King Badge purchase pages
+  if (isBuyBadgeRoute) return null;
+  // Hide ads inside any popup / dialog
+  if (insidePopup) return null;
   // Hide ads for King Badge holders
   if (isVerified) return null;
   if (!adScript) return null;
