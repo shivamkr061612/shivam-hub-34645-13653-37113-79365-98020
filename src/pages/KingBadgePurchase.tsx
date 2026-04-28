@@ -454,6 +454,39 @@ const BlueTickPurchase = () => {
                   </div>
                 </div>
 
+                {/* UPI Intent Buttons - open user's UPI app directly */}
+                {settings?.upiId && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-center text-muted-foreground">Pay using UPI app</p>
+                    {(() => {
+                      const upiParams = `pa=${encodeURIComponent(settings.upiId)}&pn=${encodeURIComponent(settings?.payeeName || 'TS HUB')}&am=${getPrice(plan)}&cu=INR&tn=${encodeURIComponent('King Badge ' + plan)}`;
+                      const apps = [
+                        { name: 'Any UPI App', scheme: `upi://pay?${upiParams}`, color: 'from-primary to-secondary' },
+                        { name: 'Google Pay', scheme: `tez://upi/pay?${upiParams}`, color: 'from-blue-500 to-green-500' },
+                        { name: 'PhonePe', scheme: `phonepe://pay?${upiParams}`, color: 'from-purple-600 to-purple-800' },
+                        { name: 'Paytm', scheme: `paytmmp://pay?${upiParams}`, color: 'from-blue-400 to-blue-600' },
+                      ];
+                      return (
+                        <div className="grid grid-cols-2 gap-2">
+                          {apps.map((app) => (
+                            <a
+                              key={app.name}
+                              href={app.scheme}
+                              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r ${app.color} text-white text-xs font-semibold shadow hover:shadow-lg active:scale-95 transition-all`}
+                            >
+                              <Smartphone className="h-4 w-4" />
+                              {app.name}
+                            </a>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                    <p className="text-[10px] text-center text-muted-foreground">
+                      Tap a button to open your UPI app with amount pre-filled. Works on mobile only.
+                    </p>
+                  </div>
+                )}
+
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
                   <p className="text-sm text-yellow-600 dark:text-yellow-400">
                     <strong>Amount to Pay:</strong> ₹{getPrice(plan)}
