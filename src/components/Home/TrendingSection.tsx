@@ -252,7 +252,7 @@ function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardSty
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
