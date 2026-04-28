@@ -211,9 +211,11 @@ function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardSty
       </div>
       <div className="space-y-3">
         {items.slice(0, 5).map((item) => (
-          <div
+          <motion.div
             key={item.id}
-            className="flex items-center gap-3 p-3 bg-card rounded-2xl border border-border hover:border-primary/20 cursor-pointer transition-all"
+            whileHover={{ x: 4, scale: 1.01 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+            className="flex items-center gap-3 p-3 glass-card rounded-2xl hover:border-primary/30 cursor-pointer transition-all"
             onClick={() => onItemClick(item)}
           >
             <div className="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border border-border bg-muted">
