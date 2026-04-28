@@ -85,17 +85,23 @@ export function SectionCard({ icon: Icon, title, description, path, index, exter
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.06, type: "spring", stiffness: 150 }}
-        whileHover={{ y: -4 }}
+        whileHover={{ y: -6, scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         className="h-full"
       >
-        <Card className={`h-full group relative overflow-hidden border border-border bg-card transition-all duration-300 ${colors.shadow} ${colors.border}`}>
+        <Card className={`h-full group relative overflow-hidden glass-card rounded-2xl transition-all duration-300 ${colors.shadow} ${colors.border} cursor-pointer`}
+          onClick={handleGetStarted}
+        >
           {/* Colored top accent bar */}
           <div className={`h-1 w-full bg-gradient-to-r ${colors.gradient}`} />
-          
+
+          {/* Subtle gradient glow on hover */}
+          <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${colors.gradient} pointer-events-none`} style={{ mixBlendMode: 'overlay' }} />
+
           <CardHeader className="relative z-10 pb-2 pt-4 px-3">
             <motion.div 
-              className={`${colors.iconBg} h-12 w-12 rounded-2xl flex items-center justify-center mb-3`}
-              whileHover={{ scale: 1.08, rotate: 3 }}
+              className={`${colors.iconBg} h-12 w-12 rounded-2xl flex items-center justify-center mb-3 backdrop-blur-md border border-white/10 shadow-sm`}
+              whileHover={{ scale: 1.12, rotate: 6 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <Icon className="h-6 w-6" style={{ color: 'hsl(var(--foreground))' }} strokeWidth={1.8} />
@@ -109,13 +115,13 @@ export function SectionCard({ icon: Icon, title, description, path, index, exter
           
           <CardContent className="relative z-10 pt-1 pb-4 px-3">
             <Button 
-              onClick={handleGetStarted} 
+              onClick={(e) => { e.stopPropagation(); handleGetStarted(); }} 
               size="sm"
-              className={`bg-gradient-to-r ${colors.btnGradient} text-white font-semibold text-xs rounded-xl border-0 hover:opacity-90 transition-opacity h-8 px-3`}
+              className={`bg-gradient-to-r ${colors.btnGradient} text-white font-semibold text-xs rounded-xl border-0 hover:opacity-90 hover:shadow-lg transition-all h-8 px-3`}
             >
               <span className="flex items-center gap-1.5">
                 Explore
-                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
           </CardContent>

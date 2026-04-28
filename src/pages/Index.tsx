@@ -51,10 +51,10 @@ const Index = () => {
           {/* Categories */}
           <div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="flex items-center gap-2 mb-3">
-              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-secondary" />
-              <h2 className="text-lg font-extrabold text-foreground">Categories</h2>
+              <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-primary via-secondary to-accent" />
+              <h2 className="text-lg font-extrabold gradient-text">Categories</h2>
             </motion.div>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-3">
               {sections.map((section, index) => (
                 <SectionCard key={section.title} icon={section.icon} title={section.title} description={section.description} path={section.path} external={section.external} index={index} />
               ))}

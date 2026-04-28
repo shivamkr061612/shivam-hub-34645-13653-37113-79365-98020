@@ -15,6 +15,16 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
   const { isVerified } = useVerification();
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isBuyBadgeRoute = location.pathname.startsWith('/buy-king-badge') || location.pathname.startsWith('/buy-bluetick');
+  const [insidePopup, setInsidePopup] = useState(false);
+
+  // Detect if rendered inside a Dialog / popup
+  useEffect(() => {
+    if (containerRef.current) {
+      const inDialog = !!containerRef.current.closest('[role="dialog"], [data-radix-dialog-content], [data-no-ads]');
+      setInsidePopup(inDialog);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -28,7 +38,8 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
             setAdScript('');
             return;
           }
-          const script = ads[position] || ads['global'] || '';
+          // Only render ads in explicitly configured positions (no global fallback)
+          const script = ads[position] || '';
           setAdScript(script);
         }
       } catch (error) {
@@ -53,6 +64,10 @@ export function AdSlot({ position, className = '' }: AdSlotProps) {
 
   // Hide ads on admin routes
   if (isAdminRoute) return null;
+  // Hide ads on King Badge purchase pages
+  if (isBuyBadgeRoute) return null;
+  // Hide ads inside any popup / dialog
+  if (insidePopup) return null;
   // Hide ads for King Badge holders
   if (isVerified) return null;
   if (!adScript) return null;

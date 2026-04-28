@@ -169,6 +169,32 @@ export function AdminAds() {
         </CardContent>
       </Card>
 
+      {/* Per-button Popunder Ad URL */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Link className="h-5 w-5 text-primary" />
+            Per-Button Popunder URL
+          </CardTitle>
+          <CardDescription>
+            URL opened in a new tab on the first 2 clicks of any download/explore button.
+            After 2 ads on the same button, no further ads are shown for that button.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Input
+            value={ads.popunderUrl || ''}
+            onChange={(e) => setAds({ ...ads, popunderUrl: e.target.value })}
+            placeholder="https://your-ad-network.example/redirect"
+            className="font-mono text-xs"
+          />
+          <Button onClick={handleSave} disabled={loading} className="w-full">
+            <Save className="h-4 w-4 mr-2" />
+            Save Popunder URL
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Shortener Settings */}
       <Card>
         <CardHeader>
