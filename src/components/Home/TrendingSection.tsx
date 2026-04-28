@@ -7,6 +7,7 @@ import { Flame, ArrowRight, Star, Shield, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useAdGate } from '@/hooks/useAdGate';
 
 interface TrendingItem {
   id: string;
