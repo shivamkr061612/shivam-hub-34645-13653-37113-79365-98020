@@ -133,6 +133,7 @@ interface SectionProps {
 
 function Section({ title, icon, iconBg, items, onItemClick, viewAllPath, cardStyle }: SectionProps) {
   const navigate = useNavigate();
+  const { triggerAd } = useAdGate(`trending-download-${title}`);
 
   if (cardStyle === 'featured') {
     return (
