@@ -90,6 +90,46 @@ export default function ItemDetails() {
     }
   }, [user, item]);
 
+  // Inject per-item SEO so Google ranks this page for the mod/app name
+  useSEO(
+    item
+      ? {
+          title: item.title,
+          description:
+            (item.description || '').slice(0, 160) ||
+            `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
+          keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
+          image: item.image || item.thumbnail,
+          url: `https://techshivam.in/#/item/${type}/${item.id}`,
+          type: 'article',
+          jsonLd: {
+            '@context': 'https://schema.org',
+            '@type': type === 'games' || type === 'mods' ? 'SoftwareApplication' : 'CreativeWork',
+            name: item.title,
+            description: item.description || `Download ${item.title} from TS HUB`,
+            image: item.image || item.thumbnail,
+            url: `https://techshivam.in/#/item/${type}/${item.id}`,
+            applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
+            operatingSystem: 'Android',
+            offers: {
+              '@type': 'Offer',
+              price: item.isPremium ? (item.price || '0') : '0',
+              priceCurrency: 'INR',
+            },
+            aggregateRating:
+              likeCount > 0
+                ? {
+                    '@type': 'AggregateRating',
+                    ratingValue: '4.8',
+                    ratingCount: Math.max(likeCount, 5),
+                  }
+                : undefined,
+            author: { '@type': 'Organization', name: 'TS HUB' },
+          },
+        }
+      : {}
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -110,39 +150,6 @@ export default function ItemDetails() {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
   const isUpdated = item.updatedAt && (Date.now() - new Date(item.updatedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
   const isSimplifiedType = ['courses', 'bundles', 'assets'].includes(type || '');
-
-  // Inject per-item SEO so Google can rank this page for the mod/app name
-  useSEO({
-    title: item.title,
-    description:
-      (item.description || '').slice(0, 160) ||
-      `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
-    keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
-    image: item.image || item.thumbnail,
-    url: `https://techshivam.in/#/item/${type}/${item.id}`,
-    type: 'article',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': type === 'games' || type === 'mods' ? 'SoftwareApplication' : 'CreativeWork',
-      name: item.title,
-      description: item.description || `Download ${item.title} from TS HUB`,
-      image: item.image || item.thumbnail,
-      url: `https://techshivam.in/#/item/${type}/${item.id}`,
-      applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
-      operatingSystem: 'Android',
-      offers: {
-        '@type': 'Offer',
-        price: isPremium ? (item.price || '0') : '0',
-        priceCurrency: 'INR',
-      },
-      aggregateRating: likeCount > 0 ? {
-        '@type': 'AggregateRating',
-        ratingValue: '4.8',
-        ratingCount: Math.max(likeCount, 5),
-      } : undefined,
-      author: { '@type': 'Organization', name: 'TS HUB' },
-    },
-  });
 
   const handleDownloadClick = () => {
     if (!user) {
