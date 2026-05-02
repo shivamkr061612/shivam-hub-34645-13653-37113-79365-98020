@@ -29,6 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Generate sitemap.xml
+        run: node scripts/generate-sitemap.mjs
+        continue-on-error: true
+
       - name: Build project
         run: npm run build
         env:
