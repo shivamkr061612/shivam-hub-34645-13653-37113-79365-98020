@@ -4,6 +4,7 @@ import { Download, Sparkles, RefreshCw, Crown, Star, Shield, ArrowRight } from '
 import { useAuth } from '@/contexts/AuthContext';
 import { useVerification } from '@/hooks/useVerification';
 import { useNavigate } from 'react-router-dom';
+import { getItemSlug } from '@/lib/slug';
 
 interface ContentCardProps {
   item: any;
@@ -30,7 +31,7 @@ export function ContentCard({ item, type, viewMode }: ContentCardProps) {
   const isPremium = item.isPremium === true;
   const badge = typeBadge[type] || typeBadge.mods;
 
-  const handleCardClick = () => navigate(`/item/${type}/${item.id || 'item'}`, { state: { item } });
+  const handleCardClick = () => navigate(`/item/${type}/${getItemSlug(item)}`, { state: { item } });
   const rating = item.rating || (4 + Math.random()).toFixed(1);
 
   // LIST VIEW

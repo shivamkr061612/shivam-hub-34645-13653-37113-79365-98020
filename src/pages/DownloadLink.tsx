@@ -10,6 +10,7 @@ import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { toast } from 'sonner';
+import { getItemSlug } from '@/lib/slug';
 
 interface RelatedItem {
   id: string;
