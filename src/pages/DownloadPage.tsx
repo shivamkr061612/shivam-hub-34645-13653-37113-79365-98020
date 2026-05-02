@@ -8,8 +8,9 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { findItemBySlug } from '@/lib/slug';
 import { KeyGenerationDialog } from '@/components/Content/KeyGenerationDialog';
 import { useVerification } from '@/hooks/useVerification';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
@@ -29,7 +30,7 @@ interface Version {
 }
 
 export default function DownloadPage() {
-  const { type, id } = useParams();
+  const { type, slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -47,11 +48,21 @@ export default function DownloadPage() {
         setLoading(false);
         return;
       }
-      if (type && id) {
+      if (type && slug) {
         try {
-          const itemDoc = await getDoc(doc(db, type, id));
+          // Try direct doc id first
+          const itemDoc = await getDoc(doc(db, type, slug));
           if (itemDoc.exists()) {
             setItem({ id: itemDoc.id, ...itemDoc.data() });
+            setLoading(false);
+            return;
+          }
+          // Slug fallback
+          const snap = await getDocs(collection(db, type));
+          const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+          const found = findItemBySlug(all, slug);
+          if (found) {
+            setItem(found);
           } else {
             toast.error('Item not found');
             navigate('/');
@@ -68,7 +79,7 @@ export default function DownloadPage() {
       }
     };
     fetchItem();
-  }, [type, id, location.state, navigate]);
+  }, [type, slug, location.state, navigate]);
 
   const checkKeyValidity = () => {
     const expiry = localStorage.getItem('downloadKeyExpiry');
