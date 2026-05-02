@@ -114,7 +114,7 @@ export default function ItemDetails() {
             `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
           keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
           image: item.image || item.thumbnail,
-          url: `https://techshivam.in/#/item/${type}/${item.id}`,
+          url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
           type: 'article',
           jsonLd: {
             '@context': 'https://schema.org',
@@ -122,7 +122,7 @@ export default function ItemDetails() {
             name: item.title,
             description: item.description || `Download ${item.title} from TS HUB`,
             image: item.image || item.thumbnail,
-            url: `https://techshivam.in/#/item/${type}/${item.id}`,
+            url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
             applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
             operatingSystem: 'Android',
             offers: {
@@ -175,11 +175,11 @@ export default function ItemDetails() {
       return;
     }
     // Navigate to download page with versions
-    navigate(`/download/${type}/${item.id}`, { state: { item } });
+    navigate(`/download/${type}/${getItemSlug(item)}`, { state: { item } });
   };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/#/item/${type}/${item.id || 'item'}`;
+    const shareUrl = `${window.location.origin}/item/${type}/${getItemSlug(item)}`;
     const shareData = {
       title: item.title || 'Check this out!',
       text: item.description || 'Amazing content from our site',
