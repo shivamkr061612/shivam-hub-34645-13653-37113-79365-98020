@@ -13,6 +13,7 @@ import { db, storage } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { Upload, Link, Crown, Sparkles, Loader2, Plus, X, Image } from 'lucide-react';
 import { uploadToImgBB } from '@/lib/imgbb';
+import { generateSlug } from '@/lib/slug';
 
 interface Version {
   name: string;
@@ -229,6 +230,7 @@ export function AdminUpload() {
 
       const docData: Record<string, any> = {
         title: formData.title,
+        slug: generateSlug(formData.title),
         downloadUrl: downloadUrl || (finalVersions.length > 0 ? finalVersions[0].link : ''),
         thumbnail: thumbUrl,
         itemImage: itemImageUrl || thumbUrl,
