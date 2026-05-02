@@ -94,7 +94,7 @@ export default function DownloadPage() {
 
   const handleVersionClick = (version: Version) => {
     if (isVerified || !settings.keyGenerationEnabled || checkKeyValidity()) {
-      navigate(`/download-loading/${type}/${id}`, {
+      navigate(`/download-loading/${type}/${slug}`, {
         state: { item, version, type }
       });
       return;
