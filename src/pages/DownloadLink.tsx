@@ -142,7 +142,7 @@ export default function DownloadLink() {
                 <div
                   key={rItem.id}
                   className={`${theme.card} border ${theme.border} rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all`}
-                  onClick={() => navigate(`/item/${rItem.type}/${rItem.id}`, { state: { item: rItem } })}
+                  onClick={() => navigate(`/item/${rItem.type}/${getItemSlug(rItem)}`, { state: { item: rItem } })}
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-muted">
                     {rItem.thumbnail ? (
