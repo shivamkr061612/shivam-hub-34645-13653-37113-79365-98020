@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useAdGate } from '@/hooks/useAdGate';
+import { getItemSlug } from '@/lib/slug';
 
 interface TrendingItem {
   id: string;
@@ -74,7 +75,7 @@ export function TrendingSection() {
   };
 
   const handleItemClick = (item: TrendingItem) => {
-    navigate(`/item/${item.type}/${item.id}`, { state: { item } });
+    navigate(`/item/${item.type}/${getItemSlug(item)}`, { state: { item } });
   };
 
   return (

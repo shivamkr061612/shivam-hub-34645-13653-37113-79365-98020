@@ -71,7 +71,22 @@ async function main() {
     );
   }
 
-  // Dynamic content from Firestore
+  // Slug helper (mirrors src/lib/slug.ts)
+  const generateSlug = (input) => {
+    if (!input) return 'item';
+    return String(input)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80) || 'item';
+  };
+
+  // Dynamic content from Firestore — emit clean slug-based URLs only
   for (const col of CONTENT_COLLECTIONS) {
     try {
       const snap = await getDocs(collection(db, col));
@@ -81,9 +96,11 @@ async function main() {
         const lastmod =
           data.updatedAt?.toDate?.().toISOString?.().split('T')[0] ||
           data.createdAt?.toDate?.().toISOString?.().split('T')[0] ||
+          (typeof data.updatedAt === 'string' ? data.updatedAt.split('T')[0] : null) ||
+          (typeof data.createdAt === 'string' ? data.createdAt.split('T')[0] : null) ||
           new Date().toISOString().split('T')[0];
-        // Both hash and clean URL — Google primarily uses clean URL via 404 redirect trick
-        entries.push(urlEntry(`${SITE_URL}/item/${col}/${d.id}`, lastmod, '0.9', 'weekly'));
+        const slug = data.slug || generateSlug(data.title || data.name || d.id);
+        entries.push(urlEntry(`${SITE_URL}/item/${col}/${slug}`, lastmod, '0.9', 'weekly'));
       });
     } catch (err) {
       console.warn(`   ! Failed to read ${col}:`, err.message);

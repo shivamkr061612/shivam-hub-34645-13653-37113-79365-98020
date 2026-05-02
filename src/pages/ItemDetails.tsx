@@ -14,10 +14,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useVerification } from '@/hooks/useVerification';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useSEO } from '@/hooks/useSEO';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { findItemBySlug, getItemSlug } from '@/lib/slug';
 import {
   Collapsible,
   CollapsibleContent,
@@ -32,7 +33,7 @@ import {
 } from "@/components/ui/carousel";
 
 export default function ItemDetails() {
-  const { type, id } = useParams();
+  const { type, slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -54,14 +55,27 @@ export default function ItemDetails() {
         return;
       }
 
-      if (type && id) {
+      if (type && slug) {
         try {
-          const itemDoc = await getDoc(doc(db, type, id));
-          if (itemDoc.exists()) {
-            const data = itemDoc.data();
-            const fetchedItem = { id: itemDoc.id, ...data };
+          // Try direct doc id first (legacy URLs / fastest)
+          const directDoc = await getDoc(doc(db, type, slug));
+          if (directDoc.exists()) {
+            const data = directDoc.data();
+            const fetchedItem = { id: directDoc.id, ...data };
             setItem(fetchedItem);
             setLikeCount(data.likes || 0);
+            setLoading(false);
+            return;
+          }
+
+          // Slug-based: fetch all items in collection and match by slug
+          const snap = await getDocs(collection(db, type));
+          const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+          const found = findItemBySlug(all, slug);
+
+          if (found) {
+            setItem(found);
+            setLikeCount(found.likes || 0);
           } else {
             toast.error('Item not found');
             navigate('/');
@@ -79,7 +93,7 @@ export default function ItemDetails() {
     };
 
     fetchItem();
-  }, [type, id, location.state, navigate]);
+  }, [type, slug, location.state, navigate]);
 
   useEffect(() => {
     if (user && item?.id) {
@@ -100,7 +114,7 @@ export default function ItemDetails() {
             `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
           keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
           image: item.image || item.thumbnail,
-          url: `https://techshivam.in/#/item/${type}/${item.id}`,
+          url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
           type: 'article',
           jsonLd: {
             '@context': 'https://schema.org',
@@ -108,7 +122,7 @@ export default function ItemDetails() {
             name: item.title,
             description: item.description || `Download ${item.title} from TS HUB`,
             image: item.image || item.thumbnail,
-            url: `https://techshivam.in/#/item/${type}/${item.id}`,
+            url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
             applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
             operatingSystem: 'Android',
             offers: {
@@ -161,11 +175,11 @@ export default function ItemDetails() {
       return;
     }
     // Navigate to download page with versions
-    navigate(`/download/${type}/${item.id}`, { state: { item } });
+    navigate(`/download/${type}/${getItemSlug(item)}`, { state: { item } });
   };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/#/item/${type}/${item.id || 'item'}`;
+    const shareUrl = `${window.location.origin}/item/${type}/${getItemSlug(item)}`;
     const shareData = {
       title: item.title || 'Check this out!',
       text: item.description || 'Amazing content from our site',

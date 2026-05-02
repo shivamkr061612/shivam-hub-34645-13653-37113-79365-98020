@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MaintenancePopup } from "@/components/Maintenance/MaintenancePopup";
 import { MaintenanceBlocker } from "@/components/Maintenance/MaintenanceBlocker";
@@ -80,10 +80,10 @@ const AppContent = () => {
             <Route path="/social" element={<Social />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/tech-ai" element={<TechAI />} />
-            <Route path="/item/:type/:id" element={<ItemDetails />} />
-            <Route path="/download/:type/:id" element={<DownloadPage />} />
-            <Route path="/download-loading/:type/:id" element={<DownloadLoading />} />
-            <Route path="/download-link/:type/:id" element={<DownloadLink />} />
+            <Route path="/item/:type/:slug" element={<ItemDetails />} />
+            <Route path="/download/:type/:slug" element={<DownloadPage />} />
+            <Route path="/download-loading/:type/:slug" element={<DownloadLoading />} />
+            <Route path="/download-link/:type/:slug" element={<DownloadLink />} />
             <Route path="/user-upload" element={<UserUpload />} />
             <Route path="/promotions" element={<Promotions />} />
             {/* Legal Pages */}
@@ -128,9 +128,9 @@ const App = () => {
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <HashRouter>
+            <BrowserRouter>
               <AppContent />
-            </HashRouter>
+            </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
       </QueryClientProvider>

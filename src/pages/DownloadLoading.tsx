@@ -9,6 +9,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
+import { getItemSlug } from '@/lib/slug';
 
 export default function DownloadLoading() {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export default function DownloadLoading() {
       setProgress(100);
 
       await delay(400);
-      navigate(`/download-link/${type}/${item.id}`, {
+      navigate(`/download-link/${type}/${getItemSlug(item)}`, {
         state: { item, version, type },
         replace: true
       });

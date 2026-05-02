@@ -217,7 +217,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
         used: false
       });
 
-      const verificationUrl = `${window.location.origin}/#/verification-success?userId=${user.uid}`;
+      const verificationUrl = `${window.location.origin}/verification-success?userId=${user.uid}`;
       const alias = `vfy_${Date.now()}`;
 
       const apiUrl = `${shortenerApi}?api=${shortenerApiKey}&url=${encodeURIComponent(verificationUrl)}&alias=${alias}`;
@@ -349,7 +349,7 @@ export function KeyGenerationDialog({ open, onOpenChange, onKeyGenerated, destin
           <Button 
             onClick={() => {
               onOpenChange(false);
-              window.location.href = '/#/buy-bluetick';
+              window.location.href = '/buy-bluetick';
             }}
             variant="outline"
             size="sm"

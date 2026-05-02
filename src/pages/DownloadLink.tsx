@@ -10,6 +10,7 @@ import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { toast } from 'sonner';
+import { getItemSlug } from '@/lib/slug';
 
 interface RelatedItem {
   id: string;
@@ -141,7 +142,7 @@ export default function DownloadLink() {
                 <div
                   key={rItem.id}
                   className={`${theme.card} border ${theme.border} rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all`}
-                  onClick={() => navigate(`/item/${rItem.type}/${rItem.id}`, { state: { item: rItem } })}
+                  onClick={() => navigate(`/item/${rItem.type}/${getItemSlug(rItem)}`, { state: { item: rItem } })}
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-muted">
                     {rItem.thumbnail ? (
