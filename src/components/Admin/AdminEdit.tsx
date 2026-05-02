@@ -11,6 +11,7 @@ import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, X, Crown, Loader2, Image } from 'lucide-react';
 import { uploadToImgBB } from '@/lib/imgbb';
+import { generateSlug } from '@/lib/slug';
 import {
   Dialog,
   DialogContent,
@@ -207,6 +208,7 @@ export function AdminEdit() {
       
       const updateData: any = {
         title: formData.title,
+        slug: generateSlug(formData.title),
         description: formData.description,
         downloadUrl: formData.downloadUrl,
         thumbnail: formData.thumbnail,
