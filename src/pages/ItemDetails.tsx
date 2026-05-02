@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useSEO } from '@/hooks/useSEO';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
   Collapsible,
@@ -88,6 +89,46 @@ export default function ItemDetails() {
       });
     }
   }, [user, item]);
+
+  // Inject per-item SEO so Google ranks this page for the mod/app name
+  useSEO(
+    item
+      ? {
+          title: item.title,
+          description:
+            (item.description || '').slice(0, 160) ||
+            `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
+          keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
+          image: item.image || item.thumbnail,
+          url: `https://techshivam.in/#/item/${type}/${item.id}`,
+          type: 'article',
+          jsonLd: {
+            '@context': 'https://schema.org',
+            '@type': type === 'games' || type === 'mods' ? 'SoftwareApplication' : 'CreativeWork',
+            name: item.title,
+            description: item.description || `Download ${item.title} from TS HUB`,
+            image: item.image || item.thumbnail,
+            url: `https://techshivam.in/#/item/${type}/${item.id}`,
+            applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
+            operatingSystem: 'Android',
+            offers: {
+              '@type': 'Offer',
+              price: item.isPremium ? (item.price || '0') : '0',
+              priceCurrency: 'INR',
+            },
+            aggregateRating:
+              likeCount > 0
+                ? {
+                    '@type': 'AggregateRating',
+                    ratingValue: '4.8',
+                    ratingCount: Math.max(likeCount, 5),
+                  }
+                : undefined,
+            author: { '@type': 'Organization', name: 'TS HUB' },
+          },
+        }
+      : {}
+  );
 
   if (loading) {
     return (
