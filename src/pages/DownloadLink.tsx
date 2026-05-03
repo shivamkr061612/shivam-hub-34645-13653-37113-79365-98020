@@ -96,7 +96,9 @@ export default function DownloadLink() {
           </div>
           <h2 className="text-xl font-bold text-foreground mb-1">Your Download is Ready!</h2>
           <p className="text-sm text-muted-foreground mb-1">{version.name}</p>
-          <p className="text-xs text-muted-foreground">Size: {version.size}</p>
+          <p className="text-xs text-muted-foreground mb-4">Size: {version.size}</p>
+          <Progress value={100} className="h-3 mb-2" />
+          <p className="text-xs text-muted-foreground">100% complete</p>
         </motion.div>
 
         <AdSlot position="download_link_top" className="mb-4" />
