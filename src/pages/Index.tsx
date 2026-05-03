@@ -26,34 +26,29 @@ const Index = () => {
   ];
 
   return (
-    <PageTransition>
-      <div className="min-h-screen relative overflow-hidden">
-        <Header />
-        <ChannelPopup />
-        <HomePopup />
-        <KingBadgePrompt />
+    <div className="min-h-screen relative">
+      <Header />
+      <ChannelPopup />
+      <HomePopup />
+      <KingBadgePrompt />
 
-        <main className="container px-3 sm:px-4 pt-3 pb-10 space-y-6 relative z-10 max-w-4xl mx-auto">
-          {/* Banner */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-            <PromotionalBanner />
-          </motion.div>
+      <main className="container px-3 sm:px-4 pt-3 pb-10 space-y-6 relative z-10 max-w-4xl mx-auto animate-fade-in">
+        {/* Banner */}
+        <PromotionalBanner />
 
-          <AdSlot position="home_after_banner" />
+        <AdSlot position="home_after_banner" />
 
-          {/* Trending */}
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <TrendingSection />
-          </motion.div>
+        {/* Trending */}
+        <TrendingSection />
 
-          <AdSlot position="home_middle" />
+        <AdSlot position="home_middle" />
 
-          {/* Categories */}
-          <div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-primary via-secondary to-accent" />
-              <h2 className="text-lg font-extrabold gradient-text">Categories</h2>
-            </motion.div>
+        {/* Categories */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-primary via-secondary to-accent" />
+            <h2 className="text-lg font-extrabold gradient-text">Categories</h2>
+          </div>
             <div className="grid grid-cols-3 gap-3">
               {sections.map((section, index) => (
                 <SectionCard key={section.title} icon={section.icon} title={section.title} description={section.description} path={section.path} external={section.external} index={index} />
