@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
-import { Download, Send, CheckCircle, Star, Shield } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Download, Send, CheckCircle, Star, Shield, HelpCircle, Wrench, FileQuestion, Package2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -11,6 +12,12 @@ import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { toast } from 'sonner';
 import { getItemSlug } from '@/lib/slug';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface RelatedItem {
   id: string;
