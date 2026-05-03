@@ -8,8 +8,6 @@ import { TechAICard } from '@/components/Home/TechAICard';
 import { QuoteCarousel } from '@/components/Home/QuoteCarousel';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { KingBadgePrompt } from '@/components/Ads/KingBadgePrompt';
-import { PageTransition } from '@/components/ui/PageTransition';
-import { motion } from 'framer-motion';
 import { useWebsiteSettings } from '@/hooks/useWebsiteSettings';
 import { ExternalLink } from 'lucide-react';
 
