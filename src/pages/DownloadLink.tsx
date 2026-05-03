@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
-import { Download, Send, CheckCircle, Star, Shield } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Download, Send, CheckCircle, Star, Shield, HelpCircle, Wrench, FileQuestion, Package2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -11,6 +12,12 @@ import { useDownloadTheme } from '@/hooks/useDownloadTheme';
 import { AdSlot } from '@/components/Ads/AdSlot';
 import { toast } from 'sonner';
 import { getItemSlug } from '@/lib/slug';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface RelatedItem {
   id: string;
@@ -89,7 +96,9 @@ export default function DownloadLink() {
           </div>
           <h2 className="text-xl font-bold text-foreground mb-1">Your Download is Ready!</h2>
           <p className="text-sm text-muted-foreground mb-1">{version.name}</p>
-          <p className="text-xs text-muted-foreground">Size: {version.size}</p>
+          <p className="text-xs text-muted-foreground mb-4">Size: {version.size}</p>
+          <Progress value={100} className="h-3 mb-2" />
+          <p className="text-xs text-muted-foreground">100% complete</p>
         </motion.div>
 
         <AdSlot position="download_link_top" className="mb-4" />
@@ -168,6 +177,94 @@ export default function DownloadLink() {
         )}
 
         <AdSlot position="download_link_bottom" className="mt-6" />
+
+        {/* Telegram Channel Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-6 flex justify-center"
+        >
+          <a
+            href={settings.telegramLink || 'https://t.me/techshivam'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 hover:border-blue-500 hover:scale-105 transition-all"
+          >
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
+              <Send className="h-5 w-5 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs text-muted-foreground">Join us on</p>
+              <p className="text-sm font-bold text-foreground">Telegram Channel</p>
+            </div>
+          </a>
+        </motion.div>
+
+        {/* FAQ Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-8"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <div className={`w-1 h-6 bg-gradient-to-b ${theme.accent} rounded-full`} />
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <HelpCircle className="h-5 w-5" /> Frequently Asked Questions
+            </h3>
+          </div>
+          <Accordion type="single" collapsible className="space-y-2">
+            <AccordionItem value="how-to-install" className={`${theme.card} border-2 ${theme.border} rounded-xl px-4`}>
+              <AccordionTrigger className="hover:no-underline">
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <Wrench className="h-4 w-4 text-primary" /> How to Install?
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground space-y-2">
+                <p>1. Download the APK / OBB / XAPK file from the link above.</p>
+                <p>2. Enable <span className="font-semibold text-foreground">"Install from Unknown Sources"</span> in your device Settings → Security.</p>
+                <p>3. Open the downloaded file and tap <span className="font-semibold text-foreground">Install</span>.</p>
+                <p>4. For OBB files, extract and place the folder in <span className="font-mono text-xs">Android/obb/</span>.</p>
+                <p>5. For XAPK, use a XAPK installer app from Play Store.</p>
+                <p>6. Launch the app and enjoy! 🎉</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="what-is-obb" className={`${theme.card} border-2 ${theme.border} rounded-xl px-4`}>
+              <AccordionTrigger className="hover:no-underline">
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <FileQuestion className="h-4 w-4 text-secondary" /> What is OBB?
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                <p><span className="font-semibold text-foreground">OBB (Opaque Binary Blob)</span> is an extra data file used by Android apps and games to store large assets like high-quality graphics, videos, and audio that can't fit inside the APK. After installing the APK, you must place the OBB file in <span className="font-mono text-xs">Android/obb/[package-name]/</span> for the app to work properly.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="what-is-xapk" className={`${theme.card} border-2 ${theme.border} rounded-xl px-4`}>
+              <AccordionTrigger className="hover:no-underline">
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <Package2 className="h-4 w-4 text-accent" /> What is XAPK?
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                <p><span className="font-semibold text-foreground">XAPK</span> is an extended APK file format that bundles the APK along with OBB data and split APKs into a single package. To install XAPK files, you need a XAPK installer app (like APKPure or XAPK Installer) which automatically handles APK installation and OBB placement.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="safe" className={`${theme.card} border-2 ${theme.border} rounded-xl px-4`}>
+              <AccordionTrigger className="hover:no-underline">
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <Shield className="h-4 w-4 text-green-500" /> Are these files safe?
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                <p>Yes! All files on TS HUB are scanned and tested before publishing. Always download from our official site for guaranteed safety. Avoid suspicious mirror links.</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </motion.div>
       </main>
     </div>
   );
