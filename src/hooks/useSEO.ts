@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 interface SEOData {
   title?: string;
+  fullTitle?: string;
   description?: string;
   keywords?: string;
   image?: string;
