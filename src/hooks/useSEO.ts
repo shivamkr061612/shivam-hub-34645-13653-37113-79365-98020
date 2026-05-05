@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 interface SEOData {
   title?: string;
+  fullTitle?: string;
   description?: string;
   keywords?: string;
   image?: string;
@@ -48,7 +49,9 @@ function setJsonLd(id: string, data: Record<string, any>) {
 
 export function useSEO(data: SEOData) {
   useEffect(() => {
-    const fullTitle = data.title
+    const fullTitle = data.fullTitle
+      ? data.fullTitle
+      : data.title
       ? `${data.title} | ${SITE_NAME} - Download Mods, Games & Apps`
       : `${SITE_NAME} - Download Premium Mods, Games, Apps & Courses`;
     const description =

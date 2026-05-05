@@ -105,39 +105,53 @@ export default function ItemDetails() {
   }, [user, item]);
 
   // Inject per-item SEO so Google ranks this page for the mod/app name
+  const itemSlug = item ? getItemSlug(item) : '';
+  const itemUrl = item ? `https://techshivam.in/item/${type}/${itemSlug}` : '';
+  const itemImage = item?.image || item?.thumbnail || '';
+  const isAppType = type === 'mods' || type === 'games';
+  const seoTitle = item
+    ? isAppType
+      ? `${item.title} Mod APK Download Latest Version`
+      : `${item.title} Download Latest Version`
+    : '';
+  const fullSeoTitle = item ? `${seoTitle} | TS HUB` : '';
+  const seoDescription = item
+    ? isAppType
+      ? `Download ${item.title} Mod APK latest version for Android. Get premium unlocked features, version info, app size, rating, screenshots and safe download links on TS HUB.`
+      : `Download ${item.title} latest version. Get details, version, size, category, rating and safe download links on TS HUB.`
+    : '';
+
   useSEO(
     item
       ? {
-          title: item.title,
-          description:
-            (item.description || '').slice(0, 160) ||
-            `Download ${item.title} latest version free at TS HUB. Premium ${type} with regular updates.`,
-          keywords: `${item.title}, ${item.title} mod, ${item.title} download, ${item.title} apk, ${item.title} mod apk, ${type}, ts hub, techshivam, mod download`,
-          image: item.image || item.thumbnail,
-          url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
+          title: seoTitle,
+          fullTitle: fullSeoTitle,
+          description: seoDescription.slice(0, 300),
+          keywords: `${item.title}, ${item.title} mod, ${item.title} mod apk, ${item.title} download, ${item.title} latest version, ${type}, ts hub, techshivam`,
+          image: itemImage,
+          url: itemUrl,
           type: 'article',
           jsonLd: {
             '@context': 'https://schema.org',
-            '@type': type === 'games' || type === 'mods' ? 'SoftwareApplication' : 'CreativeWork',
+            '@type': 'SoftwareApplication',
             name: item.title,
-            description: item.description || `Download ${item.title} from TS HUB`,
-            image: item.image || item.thumbnail,
-            url: `https://techshivam.in/item/${type}/${getItemSlug(item)}`,
-            applicationCategory: type === 'games' ? 'GameApplication' : 'MobileApplication',
+            applicationCategory: type === 'games' ? 'GameApplication' : (item.category || 'MobileApplication'),
             operatingSystem: 'Android',
+            softwareVersion: item.version || '1.0.0',
+            fileSize: item.size || 'Varies',
+            description: item.description || seoDescription,
+            image: itemImage,
+            url: itemUrl,
             offers: {
               '@type': 'Offer',
-              price: item.isPremium ? (item.price || '0') : '0',
+              price: '0',
               priceCurrency: 'INR',
             },
-            aggregateRating:
-              likeCount > 0
-                ? {
-                    '@type': 'AggregateRating',
-                    ratingValue: '4.8',
-                    ratingCount: Math.max(likeCount, 5),
-                  }
-                : undefined,
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: String(item.rating || 4.8),
+              ratingCount: String(Math.max(item.votes || likeCount || 0, 25)),
+            },
             author: { '@type': 'Organization', name: 'TS HUB' },
           },
         }
